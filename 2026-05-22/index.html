@@ -16,6 +16,8 @@
       --red: #d62728;
       --amber: #b7791f;
       --teal: #177e89;
+      --slide-w: 1120px;
+      --slide-h: 720px;
     }
     * { box-sizing: border-box; }
     body {
@@ -24,34 +26,49 @@
       color: var(--ink);
       font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
       line-height: 1.45;
+      overflow-x: hidden;
+    }
+    .deck-viewport {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
     .deck {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 28px;
+      width: var(--slide-w);
+      flex: 0 0 var(--slide-w);
+      padding: 24px 0;
+      transform-origin: top center;
     }
     .slide {
       background: var(--paper);
-      min-height: 760px;
-      margin: 0 0 28px;
-      padding: 44px 52px;
+      width: var(--slide-w);
+      height: var(--slide-h);
+      min-height: 0;
+      margin: 0 0 24px;
+      padding: 34px 44px;
       border: 1px solid var(--line);
       box-shadow: 0 10px 24px rgba(20, 32, 45, 0.08);
       page-break-after: always;
+      overflow: hidden;
+    }
+    .slide:last-child {
+      margin-bottom: 0;
     }
     .title-slide {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 760px;
+      min-height: 0;
     }
     h1, h2, h3 { margin: 0; line-height: 1.18; }
-    h1 { font-size: 48px; letter-spacing: 0; }
-    h2 { font-size: 32px; margin-bottom: 22px; border-bottom: 3px solid var(--ink); padding-bottom: 14px; }
-    h3 { font-size: 21px; margin: 22px 0 10px; }
-    p { font-size: 18px; margin: 10px 0; }
-    .subtitle { color: var(--muted); font-size: 22px; margin-top: 18px; }
-    .date { color: var(--muted); font-size: 18px; margin-top: 44px; }
+    h1 { font-size: 46px; letter-spacing: 0; }
+    h2 { font-size: 29px; margin-bottom: 16px; border-bottom: 3px solid var(--ink); padding-bottom: 11px; }
+    h3 { font-size: 19px; margin: 16px 0 8px; }
+    p { font-size: 16px; margin: 8px 0; }
+    .subtitle { color: var(--muted); font-size: 21px; margin-top: 18px; }
+    .date { color: var(--muted); font-size: 17px; margin-top: 38px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .term-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
@@ -81,17 +98,17 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    ul { margin: 10px 0 0 20px; padding: 0; font-size: 18px; }
-    li { margin: 8px 0; }
+    ul { margin: 8px 0 0 20px; padding: 0; font-size: 16px; }
+    li { margin: 6px 0; }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
-      margin: 12px 0 18px;
+      font-size: 13px;
+      margin: 10px 0 14px;
     }
     th, td {
       border: 1px solid var(--line);
-      padding: 8px 9px;
+      padding: 6px 7px;
       text-align: right;
       white-space: nowrap;
     }
@@ -103,7 +120,7 @@
     }
     .note {
       color: var(--muted);
-      font-size: 15px;
+      font-size: 14px;
     }
     .ok { color: var(--green); font-weight: 700; }
     .warn { color: var(--amber); font-weight: 700; }
@@ -129,8 +146,8 @@
       vertical-align: baseline;
     }
     .compact-slide {
-      padding-top: 30px;
-      padding-bottom: 30px;
+      padding-top: 28px;
+      padding-bottom: 28px;
     }
     .compact-slide h2 {
       font-size: 28px;
@@ -164,14 +181,14 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
-      margin-top: 18px;
+      margin-top: 12px;
     }
     .step {
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 14px;
+      padding: 12px;
       background: #f9fbfd;
-      min-height: 118px;
+      min-height: 104px;
     }
     .step b { display: block; margin-bottom: 8px; color: var(--teal); }
     .bars { margin: 12px 0 8px; }
@@ -180,8 +197,8 @@
       grid-template-columns: 180px 1fr 70px;
       align-items: center;
       gap: 10px;
-      margin: 9px 0;
-      font-size: 15px;
+      margin: 7px 0;
+      font-size: 14px;
     }
     .track {
       height: 18px;
@@ -206,12 +223,14 @@
     }
     @media print {
       body { background: white; }
-      .deck { max-width: none; padding: 0; }
-      .slide { box-shadow: none; border: none; margin: 0; min-height: 100vh; }
+      .deck-viewport { display: block; overflow: visible; height: auto !important; }
+      .deck { width: auto; transform: none !important; padding: 0; }
+      .slide { box-shadow: none; border: none; margin: 0; width: 100vw; height: 100vh; }
     }
   </style>
 </head>
 <body>
+<div class="deck-viewport">
 <main class="deck">
 
   <section class="slide title-slide">
@@ -519,5 +538,20 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
 </main>
+</div>
+<script>
+  function fitDeck() {
+    const viewport = document.querySelector(".deck-viewport");
+    const deck = document.querySelector(".deck");
+    if (!viewport || !deck) return;
+    const slideWidth = 1120;
+    const available = Math.max(320, viewport.clientWidth - 16);
+    const scale = Math.min(1, available / slideWidth);
+    deck.style.transform = `scale(${scale})`;
+    viewport.style.height = `${deck.scrollHeight * scale}px`;
+  }
+  window.addEventListener("load", fitDeck);
+  window.addEventListener("resize", fitDeck);
+</script>
 </body>
 </html>
