@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSSM1km 재현 및 확장 준비 요약 발표 - 2026-05-22</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5e6c7a;
+      --line: #d8dee6;
+      --bg: #f6f7f9;
+      --paper: #ffffff;
+      --blue: #1f77b4;
+      --green: #2ca02c;
+      --red: #d62728;
+      --amber: #b7791f;
+      --teal: #177e89;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .deck {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .slide {
+      background: var(--paper);
+      min-height: 760px;
+      margin: 0 0 28px;
+      padding: 44px 52px;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(20, 32, 45, 0.08);
+      page-break-after: always;
+    }
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 760px;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.18; }
+    h1 { font-size: 48px; letter-spacing: 0; }
+    h2 { font-size: 32px; margin-bottom: 22px; border-bottom: 3px solid var(--ink); padding-bottom: 14px; }
+    h3 { font-size: 21px; margin: 22px 0 10px; }
+    p { font-size: 18px; margin: 10px 0; }
+    .subtitle { color: var(--muted); font-size: 22px; margin-top: 18px; }
+    .date { color: var(--muted); font-size: 18px; margin-top: 44px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: #fbfcfd;
+    }
+    .metric {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    ul { margin: 10px 0 0 20px; padding: 0; font-size: 18px; }
+    li { margin: 8px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      margin: 12px 0 18px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 9px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) { text-align: left; }
+    th {
+      background: #eef2f6;
+      font-weight: 700;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .ok { color: var(--green); font-weight: 700; }
+    .warn { color: var(--amber); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .code {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      background: #f0f3f6;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 14px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    span.code {
+      display: inline;
+      padding: 0 4px;
+      border-radius: 3px;
+      font-size: 0.82em;
+      line-height: 1.15;
+      white-space: normal;
+      overflow: visible;
+      vertical-align: baseline;
+    }
+    .compact-slide {
+      padding-top: 30px;
+      padding-bottom: 30px;
+    }
+    .compact-slide h2 {
+      font-size: 28px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+    }
+    .artifact-table {
+      table-layout: fixed;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .artifact-table th,
+    .artifact-table td {
+      padding: 5px 6px;
+      white-space: normal;
+      vertical-align: top;
+      line-height: 1.22;
+    }
+    .artifact-table th:nth-child(1),
+    .artifact-table td:nth-child(1) { width: 16%; }
+    .artifact-table th:nth-child(2),
+    .artifact-table td:nth-child(2) {
+      width: 48%;
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 11px;
+    }
+    .artifact-table th:nth-child(3),
+    .artifact-table td:nth-child(3) { width: 36%; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #f9fbfd;
+      min-height: 118px;
+    }
+    .step b { display: block; margin-bottom: 8px; color: var(--teal); }
+    .bars { margin: 12px 0 8px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 70px;
+      align-items: center;
+      gap: 10px;
+      margin: 9px 0;
+      font-size: 15px;
+    }
+    .track {
+      height: 18px;
+      background: #e9eef4;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      background: var(--blue);
+    }
+    .bar.green { background: var(--green); }
+    .bar.red { background: var(--red); }
+    .bar.amber { background: var(--amber); }
+    .small { font-size: 14px; color: var(--muted); }
+    .footer {
+      margin-top: 26px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media print {
+      body { background: white; }
+      .deck { max-width: none; padding: 0; }
+      .slide { box-shadow: none; border: none; margin: 0; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide title-slide">
+    <h1>GSSM1km 재현 및 확장 준비<br>진행 요약</h1>
+    <p class="subtitle">원본 GSSM1km 방법론 추적, 입력자료 재현, LST 병목 분석, ContinuousLST 원본 방식 구현 현황입니다.</p>
+    <p class="date">2026-05-22 · C:\BESS\GLASS_SM_GSSM</p>
+  </section>
+
+  <section class="slide">
+    <h2>1. 연구 목표와 현재 질문</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>최종 목표입니다</h3>
+        <ul>
+          <li>공식 GSSM1km 2000-2020 산출물과 최대한 연속적인 토양수분 자료를 재현합니다.</li>
+          <li>2021년 이후 기간으로 확장 가능한 표층 토양수분 산출 workflow를 만듭니다.</li>
+          <li>단순히 RF 모델만 맞추는 것이 아니라 입력 predictor와 전처리 방법을 원본에 맞춥니다.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>현재 핵심 질문입니다</h3>
+        <ul>
+          <li>공식 GSSM과의 차이가 RF 때문인지, NDVI/EVI 때문인지, LST 때문인지 분리해야 합니다.</li>
+          <li>특히 LST gap-filled/blended 자료가 원본 재현의 가장 큰 병목인지 확인해야 합니다.</li>
+          <li>원본 방식 구현 후에도 남는 차이가 어느 정도인지 정량화해야 합니다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">핵심 결론: 현재 가장 큰 병목은 NDVI/EVI가 아니라 gap-filled LST입니다.</div>
+  </section>
+
+  <section class="slide">
+    <h2>2. 전체 실험 흐름입니다</h2>
+    <div class="flow">
+      <div class="step"><b>1. 원본 확보</b>GSSM1km GitHub 코드와 OEEL, ContinuousLST 원본 코드를 references에 저장했습니다.</div>
+      <div class="step"><b>2. Predictor 재현</b>ERA5, SoilGrids, MODIS NDVI/EVI, MODIS LST predictor를 재구성했습니다.</div>
+      <div class="step"><b>3. SM 검증</b>공식 GSSM 산출물과 생성 SM을 validation sample에서 비교했습니다.</div>
+      <div class="step"><b>4. 오차 분해</b>NDVI/EVI, LST_DAILY, LST_Diff별 predictor 오차를 따로 계산했습니다.</div>
+      <div class="step"><b>5. 원본 LST 추적</b>저자 LST asset과 ContinuousLST 원본 구현 구조를 확인했습니다.</div>
+    </div>
+    <h3>재현에 사용한 주요 reference입니다</h3>
+    <ul>
+      <li><span class="code">references/GSSM1km-main</span>: 공식 GSSM1km GitHub 코드입니다.</li>
+      <li><span class="code">references/OpenEarthEngineLibrary</span>: OEEL Savatsky-Golay 원본 코드입니다.</li>
+      <li><span class="code">references/ContinuousLST</span>: Shiff et al. ContinuousLST 원본 코드입니다.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>3. 원본 GSSM 방법을 어떻게 해석했는지입니다</h2>
+    <div class="grid-2">
+      <div>
+        <h3>Vegetation predictor입니다</h3>
+        <ul>
+          <li>원본은 <span class="code">users/OEEL/lib:loadAll</span>의 <span class="code">SavatskyGolayFilter</span>를 사용합니다.</li>
+          <li>MOD13A2 NDVI/EVI를 SG smoothing 후 daily linear interpolation합니다.</li>
+          <li>프로젝트에 <span class="code">sg_oeel_original</span> mode를 구현했습니다.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>LST predictor입니다</h3>
+        <ul>
+          <li>원본 GSSM script는 raw MODIS가 아니라 저자 gap-filled/blended LST asset을 읽습니다.</li>
+          <li>Europe 공개 asset은 <span class="code">users/qianrswaterAmerica/LSTEuropeMOD11A1</span>입니다.</li>
+          <li>공식 LST는 day/night를 먼저 만든 뒤 <span class="code">LST_DAILY</span>와 <span class="code">LST_Diff</span>를 계산합니다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code">LST_DAILY = (LST_Day + LST_Night) / 2
+LST_Diff  = LST_Day - LST_Night</div>
+  </section>
+
+  <section class="slide">
+    <h2>4. 시도한 방법 목록입니다</h2>
+    <table>
+      <thead>
+        <tr><th>구분</th><th>Mode / 방법</th><th>의도</th><th>결과 요약</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vegetation</td><td>sg_linear</td><td>기본 SG + daily interpolation</td><td class="ok">현재 SM 재현 기준 기본값입니다.</td></tr>
+        <tr><td>Vegetation</td><td>sg_oeel_like</td><td>OEEL 유사 local polynomial SG</td><td>7월은 소폭 개선, 1월은 악화되었습니다.</td></tr>
+        <tr><td>Vegetation</td><td>sg_oeel_original</td><td>OEEL 원본 matrixSolve SG 포팅</td><td>원본 알고리즘 구현은 성공했지만 SM 개선은 제한적입니다.</td></tr>
+        <tr><td>LST</td><td>raw MODIS/006</td><td>raw-valid baseline</td><td class="ok">raw가 있는 pixel에서는 저자 LST와 사실상 동일합니다.</td></tr>
+        <tr><td>LST</td><td>shiff_tfa</td><td>TFA + CFSv2 anomaly gap-fill</td><td class="bad">gap 영역에서 LST_Diff RMSE가 큽니다.</td></tr>
+        <tr><td>LST</td><td>author_europe</td><td>저자 Europe LST asset 직접 사용</td><td class="ok">2012-2020 Europe 검증 기준으로 완전 일치합니다.</td></tr>
+        <tr><td>LST</td><td>continuouslst_original</td><td>ContinuousLST 원본 asset 기반 구조</td><td class="warn">구현 완료, Europe TFA export는 asset quota로 실패했습니다.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="slide">
+    <h2>5. SM 산출 검증 결과입니다</h2>
+    <p>2010년 1월/7월, raw MODIS/006 LST, MODIS/006 vegetation, RF training sample 최대 50,000개, validation 최대 50개/day 기준입니다. 비교 대상은 공식 GSSM SM입니다.</p>
+    <table>
+      <thead>
+        <tr><th>월</th><th>Vegetation mode</th><th>표본 n</th><th>Bias</th><th>RMSE</th><th>r</th><th>R²</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2010-01</td><td>sg_linear</td><td>186</td><td>-0.001139</td><td><b>0.014201</b></td><td>0.982987</td><td>0.9663</td></tr>
+        <tr><td>2010-01</td><td>sg_oeel_like</td><td>186</td><td>-0.001119</td><td>0.015273</td><td>0.980765</td><td>0.9619</td></tr>
+        <tr><td>2010-01</td><td>sg_oeel_original</td><td>186</td><td>-0.001007</td><td>0.015214</td><td>0.980786</td><td>0.9620</td></tr>
+        <tr><td>2010-07</td><td>sg_linear</td><td>839</td><td>-0.001507</td><td>0.028368</td><td>0.953783</td><td>0.9097</td></tr>
+        <tr><td>2010-07</td><td>sg_oeel_like</td><td>839</td><td>-0.001661</td><td><b>0.028280</b></td><td>0.954247</td><td>0.9106</td></tr>
+        <tr><td>2010-07</td><td>sg_oeel_original</td><td>839</td><td>-0.001661</td><td><b>0.028280</b></td><td>0.954247</td><td>0.9106</td></tr>
+      </tbody>
+    </table>
+    <div class="bars">
+      <div class="bar-row"><span>2010-01 sg_linear</span><div class="track"><div class="bar green" style="width:46%"></div></div><span>0.0142</span></div>
+      <div class="bar-row"><span>2010-01 OEEL original</span><div class="track"><div class="bar amber" style="width:49%"></div></div><span>0.0152</span></div>
+      <div class="bar-row"><span>2010-07 sg_linear</span><div class="track"><div class="bar" style="width:91%"></div></div><span>0.0284</span></div>
+      <div class="bar-row"><span>2010-07 OEEL original</span><div class="track"><div class="bar" style="width:91%"></div></div><span>0.0283</span></div>
+    </div>
+    <p class="note">해석: OEEL 원본 구현은 성공했지만, SM 재현 개선은 제한적입니다. 따라서 차이의 주 원인은 vegetation이 아닙니다.</p>
+  </section>
+
+  <section class="slide">
+    <h2>6. Predictor 단위 오차 분해입니다</h2>
+    <p>공식 validation sample에 저장된 predictor와 현재 생성 predictor를 직접 비교했습니다. 정적 변수와 ERA5 변수는 거의 일치했습니다. 남는 큰 차이는 LST와 vegetation입니다.</p>
+    <table>
+      <thead>
+        <tr><th>월</th><th>Predictor</th><th>표본 n</th><th>Bias</th><th>MAE</th><th>RMSE</th><th>r</th><th>R²</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2010-01</td><td>LST_DAILY</td><td>186</td><td>0.0146</td><td>0.2333</td><td>0.4380</td><td>0.9991</td><td>0.9983</td></tr>
+        <tr><td>2010-01</td><td>LST_Diff</td><td>186</td><td>-0.0742</td><td>0.5013</td><td><b>0.9388</b></td><td>0.9894</td><td>0.9790</td></tr>
+        <tr><td>2010-01</td><td>NDVI_SG_linear</td><td>186</td><td>0.0079</td><td>0.0311</td><td>0.0449</td><td>0.8580</td><td>0.7362</td></tr>
+        <tr><td>2010-01</td><td>EVI_SG_linear</td><td>186</td><td>0.0050</td><td>0.0250</td><td>0.0365</td><td>0.7814</td><td>0.6107</td></tr>
+        <tr><td>2010-07</td><td>LST_DAILY</td><td>840</td><td>-0.0489</td><td>0.3083</td><td>0.5184</td><td>0.9961</td><td>0.9923</td></tr>
+        <tr><td>2010-07</td><td>LST_Diff</td><td>840</td><td>-0.0623</td><td>0.5573</td><td><b>0.9533</b></td><td>0.9839</td><td>0.9681</td></tr>
+        <tr><td>2010-07</td><td>NDVI_SG_linear</td><td>840</td><td>0.0122</td><td>0.0499</td><td>0.0689</td><td>0.9108</td><td>0.8295</td></tr>
+        <tr><td>2010-07</td><td>EVI_SG_linear</td><td>840</td><td>0.0154</td><td>0.0479</td><td>0.0656</td><td>0.9036</td><td>0.8166</td></tr>
+      </tbody>
+    </table>
+    <p class="note">해석: LST_Diff RMSE가 약 0.94-0.95도입니다. GSSM에서는 LST_Diff가 thermal dryness proxy이므로 downstream SM에 영향을 줄 수 있습니다.</p>
+  </section>
+
+  <section class="slide">
+    <h2>7. 원본 LST asset을 직접 확인한 결과입니다</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>원본 GSSM script의 LST 입력입니다</h3>
+        <div class="code">users/qianrswaterAmerica/LSTEuropeMOD11A1
+MODIS_LST_Blended_Day_Europe{year}
+MODIS_LST_Blended_Night_Europe{year}
+divide(100)</div>
+        <p>즉, 공식 LST는 raw MODIS가 아니라 gap-filled/blended day/night LST입니다.</p>
+      </div>
+      <div class="card">
+        <h3>author_europe mode 검증입니다</h3>
+        <table>
+          <thead><tr><th>변수</th><th>표본 n</th><th>Bias</th><th>RMSE</th><th>r</th><th>R²</th></tr></thead>
+          <tbody>
+            <tr><td>LST_Day</td><td>84</td><td>0.0</td><td>0.0</td><td>1.0</td><td>1.0</td></tr>
+            <tr><td>LST_Night</td><td>84</td><td>0.0</td><td>0.0</td><td>1.0</td><td>1.0</td></tr>
+            <tr><td>LST_DAILY</td><td>84</td><td>0.0</td><td>0.0</td><td>1.0</td><td>1.0</td></tr>
+            <tr><td>LST_Diff</td><td>84</td><td>0.0</td><td>0.0</td><td>1.0</td><td>1.0</td></tr>
+          </tbody>
+        </table>
+        <p class="note">2012-07-01 author asset 직접 비교 결과입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>8. 직접 만든 LST와 저자 LST 비교입니다</h2>
+    <p>저자 LST 접근 가능 기간인 2012년에서 7일 구간을 비교했습니다. raw MODIS가 있는 pixel에서는 거의 동일하지만, gap-filled 영역에서 차이가 커집니다.</p>
+    <table>
+      <thead>
+        <tr><th>기간</th><th>Mode</th><th>변수</th><th>표본 n</th><th>Bias</th><th>RMSE</th><th>r</th><th>R²</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2012-01-01..07</td><td>raw</td><td>LST_DAILY</td><td>29</td><td>-0.0102</td><td>0.0548</td><td>1.0000</td><td>1.0000</td></tr>
+        <tr><td>2012-01-01..07</td><td>raw</td><td>LST_Diff</td><td>29</td><td>-0.0176</td><td>0.0947</td><td>0.9999</td><td>0.9998</td></tr>
+        <tr><td>2012-01-01..07</td><td>shiff_tfa</td><td>LST_DAILY</td><td>169</td><td>0.1771</td><td>2.3198</td><td>0.9658</td><td>0.9328</td></tr>
+        <tr><td>2012-01-01..07</td><td>shiff_tfa</td><td>LST_Diff</td><td>169</td><td>0.0842</td><td><b>2.9453</b></td><td>0.7119</td><td>0.5068</td></tr>
+        <tr><td>2012-07-01..07</td><td>raw</td><td>LST_DAILY</td><td>64</td><td>0.0000</td><td>0.0000</td><td>1.0000</td><td>1.0000</td></tr>
+        <tr><td>2012-07-01..07</td><td>raw</td><td>LST_Diff</td><td>64</td><td>0.0000</td><td>0.0000</td><td>1.0000</td><td>1.0000</td></tr>
+        <tr><td>2012-07-01..07</td><td>shiff_tfa</td><td>LST_DAILY</td><td>168</td><td>0.9349</td><td>2.6830</td><td>0.9305</td><td>0.8658</td></tr>
+        <tr><td>2012-07-01..07</td><td>shiff_tfa</td><td>LST_Diff</td><td>168</td><td>1.2675</td><td><b>3.5888</b></td><td>0.8437</td><td>0.7118</td></tr>
+      </tbody>
+    </table>
+    <div class="bars">
+      <div class="bar-row"><span>Jan raw LST_Diff</span><div class="track"><div class="bar green" style="width:3%"></div></div><span>0.09</span></div>
+      <div class="bar-row"><span>Jan shiff_tfa LST_Diff</span><div class="track"><div class="bar red" style="width:82%"></div></div><span>2.95</span></div>
+      <div class="bar-row"><span>Jul raw LST_Diff</span><div class="track"><div class="bar green" style="width:1%"></div></div><span>0.00</span></div>
+      <div class="bar-row"><span>Jul shiff_tfa LST_Diff</span><div class="track"><div class="bar red" style="width:100%"></div></div><span>3.59</span></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>9. raw gap 영역만 보면 더 분명합니다</h2>
+    <p><span class="code">raw_gap</span>은 raw MODIS가 결측이고 gap-filled 방법이 실제로 값을 만들어야 하는 영역입니다.</p>
+    <table>
+      <thead>
+        <tr><th>기간</th><th>Mode</th><th>Subset</th><th>변수</th><th>표본 n</th><th>Bias</th><th>RMSE</th><th>r</th><th>R²</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2012-01-01..07</td><td>shiff_tfa</td><td>raw_gap</td><td>LST_DAILY</td><td>140</td><td>0.3561</td><td>2.0863</td><td>0.9717</td><td>0.9442</td></tr>
+        <tr><td>2012-01-01..07</td><td>shiff_tfa</td><td>raw_gap</td><td>LST_Diff</td><td>140</td><td>0.1476</td><td><b>3.0248</b></td><td>0.6071</td><td>0.3686</td></tr>
+        <tr><td>2012-07-01..07</td><td>shiff_tfa</td><td>raw_gap</td><td>LST_DAILY</td><td>104</td><td>1.1534</td><td>2.6446</td><td>0.9415</td><td>0.8864</td></tr>
+        <tr><td>2012-07-01..07</td><td>shiff_tfa</td><td>raw_gap</td><td>LST_Diff</td><td>104</td><td>1.4394</td><td><b>3.6393</b></td><td>0.8351</td><td>0.6974</td></tr>
+      </tbody>
+    </table>
+    <p class="note">해석: raw MODIS scaling 문제가 아닙니다. 저자 blended LST의 결측 보간과 day/night contrast 보존을 맞춰야 합니다.</p>
+  </section>
+
+  <section class="slide">
+    <h2>10. ContinuousLST 원본 방식 구현 결과입니다</h2>
+    <div class="grid-2">
+      <div>
+        <h3>구현한 내용입니다</h3>
+        <ul>
+          <li><span class="code">references/ContinuousLST</span>에 원본 코드를 클론했습니다.</li>
+          <li><span class="code">continuouslst_original</span> mode를 추가했습니다.</li>
+          <li>원본처럼 MODIS TFA, CFSv2 TFA를 365-band asset으로 먼저 export하는 경로를 추가했습니다.</li>
+          <li>원본처럼 <span class="code">prediction.blend(raw_modis)</span> 구조를 사용했습니다.</li>
+          <li>원본 CFSv2 collection인 <span class="code">NOAA/CFSV2/FOR6H</span>를 CLI에서 지정할 수 있게 했습니다.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>export 결과입니다</h3>
+        <table>
+          <thead><tr><th>Asset</th><th>Task ID</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td>MODIS_Day_TFA</td><td>HJLK4R27...</td><td class="bad">FAILED</td></tr>
+            <tr><td>MODIS_Night_TFA</td><td>UQWWNXGR...</td><td class="bad">FAILED</td></tr>
+            <tr><td>CFSv2_Day_TFA</td><td>2MNZQRJ...</td><td class="bad">FAILED</td></tr>
+            <tr><td>CFSv2_Night_TFA</td><td>YNCZ53G...</td><td class="bad">FAILED</td></tr>
+          </tbody>
+        </table>
+        <p class="note">실패 이유: GEE asset storage quota 250 GiB 초과입니다.</p>
+      </div>
+    </div>
+    <div class="code">Exceeded quota for total asset size:
+using 250-265 GiB of 250 GiB</div>
+  </section>
+
+  <section class="slide">
+    <h2>11. 무엇을 배웠는지입니다</h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="metric">1</div>
+        <div class="label">Vegetation</div>
+        <p>OEEL 원본 SG를 구현해도 SM 재현 개선은 제한적입니다. 기본값은 <span class="code">sg_linear</span> 유지가 합리적입니다.</p>
+      </div>
+      <div class="card">
+        <div class="metric">2</div>
+        <div class="label">Raw MODIS LST</div>
+        <p>raw MODIS가 존재하는 pixel에서는 저자 LST와 거의 동일합니다. 단위 변환이나 day/night 산식 문제가 아닙니다.</p>
+      </div>
+      <div class="card">
+        <div class="metric">3</div>
+        <div class="label">Gap-filled LST</div>
+        <p>gap 영역에서 <span class="code">LST_Diff</span> 오차가 가장 큽니다. SM 재현의 핵심 병목입니다.</p>
+      </div>
+    </div>
+    <h3>가장 중요한 결론입니다</h3>
+    <p><b>공식 GSSM과 연속적인 2021+ extension을 만들려면, LST gap-fill/blending을 저자 방식에 최대한 가깝게 만드는 것이 우선입니다.</b></p>
+  </section>
+
+  <section class="slide compact-slide">
+    <h2>12. 현재 산출물과 코드 변경입니다</h2>
+    <table class="artifact-table">
+      <thead><tr><th>항목</th><th>파일 또는 경로</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td>요약 report</td><td>data/processed/gssm1km_generation/lst_predictor_error_report_2010.md</td><td>2010 predictor LST 오차 분석입니다.</td></tr>
+        <tr><td>저자 LST 비교 report</td><td>data/processed/gssm1km_generation/author_lst_comparison_2012_direct_lST.md</td><td>2012 저자 LST와 direct LST 비교입니다.</td></tr>
+        <tr><td>OEEL reference</td><td>references/OEEL_SAVATSKY_GOLAY_REFERENCE.md</td><td>원본 SG 코드 위치와 구현 차이를 기록했습니다.</td></tr>
+        <tr><td>ContinuousLST reference</td><td>references/CONTINUOUSLST_REFERENCE.md</td><td>원본 LST 코드와 export task를 기록했습니다.</td></tr>
+        <tr><td>구현 코드</td><td>src/gssm1km_generation/lst_quality.py</td><td>LST mode와 ContinuousLST original mode를 구현했습니다.</td></tr>
+        <tr><td>export 코드</td><td>src/gssm1km_generation/lst_export.py</td><td>ContinuousLST TFA asset export를 구현했습니다.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="slide">
+    <h2>13. 다음 작업 제안입니다</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>단기 작업입니다</h3>
+        <ul>
+          <li>GEE asset quota를 확보하거나 불필요한 asset을 정리합니다.</li>
+          <li>Europe 전체 대신 작은 ROI 단위로 ContinuousLST TFA export를 재시도합니다.</li>
+          <li>완료된 ROI asset으로 2012 저자 LST와 다시 비교합니다.</li>
+          <li>비교 지표는 Day, Night, LST_DAILY, LST_Diff 각각 n, Bias, RMSE, MAE, r, R²로 고정합니다.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>중기 작업입니다</h3>
+        <ul>
+          <li>저자 LST와 유사한 품질이 확인되면 2012-2020 Europe 재현 검증을 진행합니다.</li>
+          <li>2021+ extension에는 MODIS/061과 C6-compatible harmonization을 다시 연결합니다.</li>
+          <li>서버 저장 workflow에서는 gap-filled LST를 먼저 저장하고 SM 산출은 저장된 LST를 읽도록 구성합니다.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">현재 상태: LST 원본 방식 구현은 코드 수준에서 완료했지만, 대규모 TFA asset export가 GEE quota에 막혀 있습니다.</div>
+  </section>
+
+</main>
+</body>
+</html>
