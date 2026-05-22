@@ -54,6 +54,14 @@
     .date { color: var(--muted); font-size: 18px; margin-top: 44px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .term-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
+    .term {
+      border-left: 4px solid var(--teal);
+      padding: 7px 11px;
+      background: #fbfcfd;
+    }
+    .term b { display: block; margin-bottom: 3px; font-size: 16px; }
+    .term p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.35; }
     .card {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -261,7 +269,7 @@
     <h2>3. 전처리 workflow입니다</h2>
     <div class="flow">
       <div class="step"><b>Raw input</b>MODIS vegetation, MODIS LST, ERA5, SoilGrids, 공식 GSSM sample을 불러옵니다.</div>
-      <div class="step"><b>Vegetation</b>NDVI/EVI는 Savitzky-Golay smoothing 후 daily interpolation합니다.</div>
+      <div class="step"><b>Vegetation</b>NDVI/EVI는 Savitzky-Golay smoothing으로 구름/노이즈를 줄인 뒤 daily interpolation합니다.</div>
       <div class="step"><b>LST</b>day/night LST를 따로 처리한 뒤 LST_DAILY와 LST_Diff를 계산합니다.</div>
       <div class="step"><b>Sampling</b>공식 GSSM validation sample 위치와 날짜에서 predictor를 비교합니다.</div>
       <div class="step"><b>Statistics</b>n, Bias, MAE, RMSE, r, R²로 predictor와 SM 오차를 정량화합니다.</div>
@@ -272,8 +280,24 @@ LST_Diff  = LST_Day - LST_Night</div>
     <p class="note">LST_DAILY는 평균 열 상태를, LST_Diff는 주야간 온도 차이와 열적 건조도를 대변합니다. 두 변수를 분리해 보는 것이 중요합니다.</p>
   </section>
 
+  <section class="slide compact-slide">
+    <h2>4. 주요 용어 설명입니다</h2>
+    <div class="term-grid">
+      <div class="term"><b>Savitzky-Golay smoothing</b><p>시계열의 전체 형태는 유지하면서 짧은 기간의 튐이나 관측 노이즈를 줄이는 polynomial smoothing 방법입니다. 여기서는 MODIS NDVI/EVI 16일 composite를 더 부드러운 식생 계절 곡선으로 만드는 데 사용합니다.</p></div>
+      <div class="term"><b>Daily interpolation</b><p>16일 간격처럼 듬성듬성 있는 관측값 사이를 보간해 매일 값이 있는 predictor로 바꾸는 과정입니다. GSSM은 daily SM을 만들기 때문에 식생 변수도 daily 값이 필요합니다.</p></div>
+      <div class="term"><b>Gap filling</b><p>구름, 관측각, 품질 문제 등으로 빠진 pixel 값을 주변 시간 패턴이나 보조자료로 채우는 과정입니다. LST에서는 clear-sky 관측 결측이 많아 매우 중요합니다.</p></div>
+      <div class="term"><b>Blending</b><p>raw MODIS 관측값과 gap-filled 예측값을 합치는 과정입니다. raw 관측이 있으면 raw 값을 우선하고, 없을 때 예측값을 쓰는 방식이 대표적입니다.</p></div>
+      <div class="term"><b>TFA</b><p>Typical annual temperature cycle의 약자로, 여러 해 자료에서 만든 날짜별 평균적인 LST 계절 곡선입니다. 특정 날짜의 기대 LST baseline 역할을 합니다.</p></div>
+      <div class="term"><b>Anomaly</b><p>현재 값이 장기 평균 또는 TFA에서 얼마나 벗어났는지를 뜻합니다. CFSv2 anomaly를 MODIS TFA에 더하면 날씨 변동을 반영한 LST 추정값을 만들 수 있습니다.</p></div>
+      <div class="term"><b>LST_DAILY</b><p>day LST와 night LST의 평균입니다. 하루의 평균적인 지표면 열 상태를 나타냅니다.</p></div>
+      <div class="term"><b>LST_Diff</b><p>day LST에서 night LST를 뺀 값입니다. 주야간 온도 차이, 지표면 열 관성, 건조도 정보를 반영하므로 SM 산출에 민감할 수 있습니다.</p></div>
+      <div class="term"><b>Bias / MAE / RMSE</b><p>Bias는 평균적인 과대/과소 추정 방향, MAE는 평균 절대 오차, RMSE는 큰 오차에 더 민감한 평균 제곱근 오차입니다.</p></div>
+      <div class="term"><b>r / R²</b><p>r은 두 자료의 선형 상관계수이고, R²는 그 상관의 설명력입니다. r이 높아도 RMSE가 크면 실제 물리량 차이는 여전히 클 수 있습니다.</p></div>
+    </div>
+  </section>
+
   <section class="slide">
-    <h2>4. 검증 설계입니다</h2>
+    <h2>5. 검증 설계입니다</h2>
     <div class="grid-2">
       <div class="card">
         <h3>SM 재현 실험입니다</h3>
@@ -298,7 +322,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>5. SM 산출 재현 결과입니다</h2>
+    <h2>6. SM 산출 재현 결과입니다</h2>
     <p>2010년 1월/7월에서 식생 전처리 방법을 바꿔가며 공식 GSSM SM과 비교했습니다.</p>
     <table>
       <thead>
@@ -317,7 +341,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>6. Predictor 오차 분해 결과입니다</h2>
+    <h2>7. Predictor 오차 분해 결과입니다</h2>
     <p>공식 GSSM sample에 저장된 predictor와 직접 만든 predictor를 같은 위치에서 비교했습니다.</p>
     <table>
       <thead>
@@ -342,7 +366,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>7. 식생 전처리 검토입니다</h2>
+    <h2>8. 식생 전처리 검토입니다</h2>
     <div class="grid-2">
       <div class="card">
         <h3>원본 방법입니다</h3>
@@ -367,7 +391,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>8. 원본 LST 자료의 성격입니다</h2>
+    <h2>9. 원본 LST 자료의 성격입니다</h2>
     <div class="grid-2">
       <div class="card">
         <h3>공식 GSSM이 읽는 LST입니다</h3>
@@ -395,7 +419,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>9. 직접 만든 LST와 원본 LST 비교입니다</h2>
+    <h2>10. 직접 만든 LST와 원본 LST 비교입니다</h2>
     <p>2012년 접근 가능 기간에서 raw MODIS 기반 LST와 TFA/CFSv2 기반 gap-fill LST를 저자 LST와 비교했습니다.</p>
     <table>
       <thead>
@@ -414,7 +438,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>10. Gap 영역 분석입니다</h2>
+    <h2>11. Gap 영역 분석입니다</h2>
     <p>raw MODIS가 결측인 pixel만 분리하면 gap-filling 품질 차이가 더 명확해집니다.</p>
     <table>
       <thead>
@@ -437,7 +461,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>11. 원본 LST 전처리 재현 전략입니다</h2>
+    <h2>12. 원본 LST 전처리 재현 전략입니다</h2>
     <div class="grid-2">
       <div class="card">
         <h3>확인된 원본 접근입니다</h3>
@@ -462,7 +486,7 @@ LST_Diff  = LST_Day - LST_Night</div>
   </section>
 
   <section class="slide">
-    <h2>12. 결론과 다음 분석입니다</h2>
+    <h2>13. 결론과 다음 분석입니다</h2>
     <div class="grid-3">
       <div class="card">
         <div class="metric">1</div>
