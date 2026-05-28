@@ -175,7 +175,6 @@
           <div class="step"><b>확장 산출</b>2021-2024 자체 생성<br><span class="small">GEE 계산 후 저장</span></div>
           <div class="step"><b>검증</b>파일 크기·coverage<br><span class="small">데이터 무결성</span></div>
           <div class="step"><b>재구성</b>COG 또는 Zarr<br><span class="small">분석 접근성</span></div>
-          <div class="step"><b>백업</b>선택적 2차 보관<br><span class="small">장기 안정성</span></div>
         </div>
         <p class="small">핵심 질문: “서버에 얼마나 큰 공간이 필요하고, 저장 완료까지 며칠이 필요한가.”</p>
       </section>
@@ -268,7 +267,7 @@
 
       <section class="slide">
         <h2>2000-2020 저장 용량과 비용 산식</h2>
-        <div class="grid-3">
+        <div class="grid-2">
           <div class="card">
             <div class="metric">2 TB</div>
             <div class="label">최소</div>
@@ -278,11 +277,6 @@
             <div class="metric">4-6 TB</div>
             <div class="label">권장</div>
             <p>원본 ZIP + 압축 해제/재구성 작업 공간 + 검증 산출물.</p>
-          </div>
-          <div class="card">
-            <div class="metric">8-12 TB</div>
-            <div class="label">백업 포함</div>
-            <p>원본 archive와 분석용 copy를 분리하고 1회 backup까지 고려.</p>
           </div>
         </div>
         <table>
@@ -305,9 +299,9 @@
               <td>8 TB usable이면 8 × 단가/TB</td>
             </tr>
             <tr>
-              <td>백업 보관</td>
-              <td>운영 copy와 동일하거나 0.5-1.0배 추가</td>
-              <td>4 TB 운영 copy + 4 TB backup = 8 TB급 계획</td>
+              <td>임시 작업 공간</td>
+              <td>압축 해제본과 재구성본을 동시에 둘 수 있는 여유공간</td>
+              <td>원본 1.56 TiB 외에 2-4 TiB 추가 확보</td>
             </tr>
           </tbody>
         </table>
@@ -363,42 +357,42 @@
         <table>
           <thead>
             <tr>
-              <th>관측된 Europe task</th>
+              <th>실측 항목</th>
+              <th>공간·기간</th>
               <th class="num">실제 시간</th>
-              <th>전지구 환산 근거</th>
-              <th>운영 해석</th>
+              <th>추정에 쓰는 의미</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>C6.1→C6 보정</td>
+              <td>Europe 영역, 2018-2020 overlap</td>
               <td class="num">0.38-0.39 h</td>
-              <td>Europe 대비 전지구 약 10.2배</td>
-              <td>수 시간-1일 규모. 주 병목 아님.</td>
+              <td>MODIS version 보정 asset 생성. 전지구 산출의 주 병목은 아님.</td>
             </tr>
             <tr>
               <td>legacy ContinuousLST TFA</td>
+              <td>Europe 영역, 2002-2020 baseline</td>
               <td class="num">최대 1.09 h</td>
-              <td>전지구 단순 환산 약 11 h 하한</td>
-              <td>고정 UTC 방식은 비교적 안정.</td>
+              <td>고정 UTC 방식의 하한값. 전지구 단순 면적 환산 시 약 11 h 이상.</td>
             </tr>
             <tr>
               <td>pixel-time MODIS TFA smoke</td>
+              <td>Europe 영역, 2002-2003 smoke test</td>
               <td class="num">5.4-6.5 h</td>
-              <td>Europe 2년 smoke. full baseline·전지구 적용 시 증가</td>
-              <td>주 병목 후보.</td>
+              <td>픽셀별 MODIS 관측시각을 쓰면 계산 시간이 크게 증가.</td>
             </tr>
             <tr>
               <td>pixel-time CFS TFA smoke</td>
+              <td>Europe 영역, 2002-2003 smoke test</td>
               <td class="num">8.8 h 시점 running</td>
-              <td>재시도 2-3회 관측</td>
-              <td>계산 방식 최적화 필요.</td>
+              <td>CFSv2 시간 보간이 현재 가장 큰 시간 불확실성.</td>
             </tr>
           </tbody>
         </table>
         <div class="term">
-          <b>공간 배율</b>
-          <p>TPDC archive 기준 Europe 21년 총량 약 156 GiB, 전지구 총량 약 1593 GiB. 전지구 규모는 Europe의 약 10.2배.</p>
+          <b>환산 기준</b>
+          <p>TPDC archive 기준 Europe 21년 총량 약 156 GiB, 전지구 총량 약 1593 GiB. 전지구 면적·파일 규모는 Europe의 약 10.2배. GEE queue와 재시도 때문에 실제 일정은 선형 환산보다 길어질 수 있음.</p>
         </div>
       </section>
 
@@ -435,28 +429,6 @@
             <tr><td>SM + day/night LST + 작업 copy 저장</td><td class="num">6-10주</td><td>전지구 초기 production, queue와 재실행 포함</td></tr>
           </tbody>
         </table>
-      </section>
-
-      <section class="slide">
-        <h2>서버 저장 운영안</h2>
-        <div class="flow">
-          <div class="step"><b>1</b>TPDC 원본 ZIP<br><span class="small">읽기 전용 보관</span></div>
-          <div class="step"><b>2</b>checksum/size manifest<br><span class="small">재시작 기준</span></div>
-          <div class="step"><b>3</b>분석용 COG/Zarr<br><span class="small">필요 범위 생성</span></div>
-          <div class="step"><b>4</b>2021+ 산출물<br><span class="small">버전별 분리</span></div>
-          <div class="step"><b>5</b>백업 정책<br><span class="small">원본 우선</span></div>
-        </div>
-        <div class="grid-2">
-          <div class="term">
-            <b>추천 저장 원칙</b>
-            <p>원본 ZIP은 수정하지 않고 보존. 분석용 파일은 재생성 가능하도록 manifest와 산출 코드 버전을 함께 기록.</p>
-          </div>
-          <div class="term">
-            <b>삭제 가능한 대상</b>
-            <p>GEE export 임시 파일, 부분 산출물, 재구성 중간파일. 원본 TPDC archive와 최종 산출물은 삭제 대상에서 제외.</p>
-          </div>
-        </div>
-        <p class="small">비용을 낮추려면 “원본 archive + 최종 SM”을 우선 저장하고, LST 중간산출물은 검증이 끝난 범위부터 선택 보관.</p>
       </section>
 
       <section class="slide">
@@ -499,7 +471,7 @@
         </table>
         <div class="term">
           <b>실행 전 확인값</b>
-          <p>서버의 실제 빈 공간, FTP 실효 속도, 백업 필요 여부, LST 중간산출물 보관 범위. 이 네 값이 확정되면 비용 범위도 좁아짐.</p>
+          <p>서버의 실제 빈 공간, FTP 실효 속도, LST 중간산출물 보관 범위. 이 값이 확정되면 비용 범위도 좁아짐.</p>
         </div>
       </section>
     </main>
