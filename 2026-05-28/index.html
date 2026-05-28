@@ -229,19 +229,19 @@
           <tbody>
             <tr>
               <td>단축 시나리오</td>
-              <td>LST/NDVI/EVI 전처리 안정, export 실패 적음</td>
+              <td>legacy TFA 수준의 export 안정성, 실패 재시도 적음</td>
               <td class="num">2-4주</td>
-              <td>테스트 통과 후 tile-year export가 안정적으로 완료되는 경우.</td>
+              <td>Europe full-period TFA 관측 시간 약 1.1 h를 전지구 배율 10.2배로 확장한 하한에 queue와 검증을 더한 일정.</td>
             </tr>
             <tr>
               <td>기준 시나리오</td>
               <td>pixel-time LST, C6.1 보정, 검증 포함</td>
               <td class="num">4-8주</td>
-              <td>현재 기준 추정치. 검증과 재시도 일부 포함.</td>
+              <td>현재 기준 추정치. Europe pixel-time smoke task가 6-9 h 수준으로 legacy보다 무거운 점 반영.</td>
             </tr>
             <tr>
               <td>지연 시나리오</td>
-              <td>GEE quota, queue, 일부 region 재시도, 서버 저장 정리 포함</td>
+              <td>CFS pixel-time task 재시도, GEE queue, 일부 region 재실행</td>
               <td class="num">6-10주</td>
               <td>전지구 산출 초기 실행에서 필요한 상한 추정.</td>
             </tr>
@@ -252,6 +252,50 @@
           <p>전지구 전체를 단일 asset으로 만들지 않고, 공간 tile과 연도 단위로 나눠 export하는 방식. 실패 복구와 저장 관리에 유리.</p>
         </div>
         <p class="small">전제: 2000-2020 공식 GSSM은 그대로 사용. 새로 만드는 것은 2021-2024 확장 기간.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>GEE task 기반 산출 시간 근거</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>관측 task</th>
+              <th>Europe 관측 시간</th>
+              <th>전지구 환산 근거</th>
+              <th>해석</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>C6.1→C6 보정</td>
+              <td>0.38-0.39 h/task</td>
+              <td>Europe 대비 전지구 약 10.2배</td>
+              <td>전지구에서도 수 시간-1일 규모. 주 병목 아님.</td>
+            </tr>
+            <tr>
+              <td>legacy ContinuousLST TFA</td>
+              <td>2002-2020 Europe 4 task, 최대 1.09 h</td>
+              <td>단순 공간 배율 적용 시 약 11 h 하한</td>
+              <td>고정 UTC 방식은 계산 가능성이 높음. queue 포함 1-3일 수준.</td>
+            </tr>
+            <tr>
+              <td>pixel-time TFA smoke</td>
+              <td>2002-2003 Europe MODIS day/night 5.4/6.5 h, CFS는 8.8 h 시점 running</td>
+              <td>기간 19년 × 공간 10.2배로 확장 시 가장 큰 불확실성</td>
+              <td>전지구 production 일정의 주 병목. 1-3주 이상 precompute 가능.</td>
+            </tr>
+            <tr>
+              <td>2021-2024 최종 SM 저장량</td>
+              <td>공식 21년 archive의 4/21 비율</td>
+              <td>1.56 TiB × 4/21 ≈ 0.30 TiB</td>
+              <td>최종 SM만 저장할 때의 압축 archive 규모. LST 중간산출물 보관 시 증가.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>공간 배율</b>
+          <p>TPDC archive 기준 Europe 21년 총량은 약 156 GiB, 전지구 총량은 약 1593 GiB. 전지구 산출 규모는 Europe의 약 10.2배로 추정.</p>
+        </div>
       </section>
 
       <section class="slide tight">
@@ -293,7 +337,7 @@
           </div>
           <div class="term">
             <b>확인된 저장 규모</b>
-            <p>TPDC zip archive 기준 약 1.59 TiB. 압축 해제본과 분석용 재구성본을 함께 보관하면 추가 저장 공간 필요.</p>
+            <p>TPDC zip archive 기준 1,710,683,131,495 bytes. 약 1.71 TB, 1.56 TiB. 압축 해제본과 분석용 재구성본을 함께 보관하면 추가 저장 공간 필요.</p>
           </div>
         </div>
         <p class="small">GEE point sampling 코드는 full raster archive 저장용이 아님. 로컬 보관은 원본 archive 보존과 분석용 재구성을 분리하는 방식이 적절.</p>
@@ -332,7 +376,7 @@
             </tr>
             <tr>
               <td>총 용량</td>
-              <td>약 1.59 TiB compressed zip</td>
+              <td>약 1.71 TB, 1.56 TiB compressed zip</td>
               <td><span class="warn">서버 저장 계획 필요</span></td>
             </tr>
             <tr>
@@ -349,16 +393,16 @@
         <h2>전지구 archive 다운로드 시간</h2>
         <div class="grid-2">
           <div>
-            <div class="bar-row"><span>20 Mbps</span><div class="track"><div class="bar red" style="width:100%"></div></div><span>약 8일</span></div>
-            <div class="bar-row"><span>50 Mbps</span><div class="track"><div class="bar amber" style="width:40%"></div></div><span>약 3일</span></div>
-            <div class="bar-row"><span>100 Mbps</span><div class="track"><div class="bar green" style="width:20%"></div></div><span>약 1.6일</span></div>
-            <div class="bar-row"><span>200 Mbps</span><div class="track"><div class="bar green" style="width:10%"></div></div><span>약 19시간</span></div>
-            <p class="small">순수 전송 시간. 1.59 TiB compressed zip 기준.</p>
+            <div class="bar-row"><span>20 Mbps</span><div class="track"><div class="bar red" style="width:100%"></div></div><span>7.9일</span></div>
+            <div class="bar-row"><span>50 Mbps</span><div class="track"><div class="bar amber" style="width:40%"></div></div><span>3.2일</span></div>
+            <div class="bar-row"><span>100 Mbps</span><div class="track"><div class="bar green" style="width:20%"></div></div><span>1.6일</span></div>
+            <div class="bar-row"><span>200 Mbps</span><div class="track"><div class="bar green" style="width:10%"></div></div><span>19.0시간</span></div>
+            <p class="small">순수 전송 시간. 계산식: 1,710,683,131,495 bytes × 8 / network speed.</p>
           </div>
           <div class="card">
             <div class="metric">4일-2주</div>
             <div class="label">실행 일정 추정</div>
-            <p>FTP 병렬 다운로드, 실패 재시도, 파일 크기 검증, manifest 정리를 포함한 현실적 범위.</p>
+            <p>50-100 Mbps 수준의 실효 대역폭, 20-30% overhead, FTP 재접속과 파일 검증을 포함한 범위.</p>
             <p class="small">압축 해제와 분석용 재구성까지 포함하면 추가 1-3일 이상 필요.</p>
           </div>
         </div>
