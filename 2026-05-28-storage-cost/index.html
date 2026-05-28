@@ -151,23 +151,23 @@
   <div class="deck-viewport">
     <main class="deck" id="deck">
       <section class="slide title-slide">
-        <h1>GSSM1km 서버 저장 시간·비용 추정</h1>
-        <p class="subtitle">산출물 정확도 평가 제외. 연구실 서버에 원본 archive와 확장 산출물을 저장하는 운영 규모 추정.</p>
+        <h1>GSSM1km 서버 저장 소요 시간 추정</h1>
+        <p class="subtitle">2000-2024년 전지구 1 km 토양수분 데이터셋을 연구실 서버에 저장하는 데 필요한 용량과 시간.</p>
         <p class="date">2026-05-28</p>
       </section>
 
       <section class="slide">
-        <h2>범위</h2>
+        <h2>저장 대상</h2>
         <div class="grid-2">
           <div class="card">
-            <div class="metric">저장</div>
-            <div class="label">이 자료의 대상</div>
-            <p>다운로드, 서버 저장, 검증, 압축 해제, 분석용 재구성에 필요한 시간과 용량.</p>
+            <div class="metric">2000-2020</div>
+            <div class="label">공식 archive 저장</div>
+            <p>TPDC 원본 archive를 연구실 서버에 직접 저장. 다운로드, 파일 검증, 압축 해제, 분석용 재구성 시간 포함.</p>
           </div>
           <div class="card">
-            <div class="metric">제외</div>
-            <div class="label">이 자료에서 다루지 않음</div>
-            <p>SM 정확도, LST 오차, 모델 재현성, 지상관측 검증 결과.</p>
+            <div class="metric">2021-2024</div>
+            <div class="label">확장 산출물 저장</div>
+            <p>GEE에서 산출한 전지구 토양수분 결과를 서버로 export 후 보관. 중간산출물 보관 여부에 따라 용량 차이 발생.</p>
           </div>
         </div>
         <div class="flow">
