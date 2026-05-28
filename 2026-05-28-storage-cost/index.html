@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSSM1km 서버 저장 시간·비용 추정 - 2026-05-28</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5c6875;
+      --line: #d8dee6;
+      --bg: #f5f7fa;
+      --paper: #ffffff;
+      --blue: #1f6fb2;
+      --teal: #137f7f;
+      --green: #2f8f46;
+      --amber: #ad7417;
+      --red: #c0392b;
+      --slide-w: 1120px;
+      --slide-h: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      line-height: 1.42;
+      overflow-x: hidden;
+    }
+    .deck-viewport {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .deck {
+      width: var(--slide-w);
+      flex: 0 0 var(--slide-w);
+      padding: 24px 0;
+      transform-origin: top center;
+    }
+    .slide {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      margin: 0 0 24px;
+      padding: 36px 46px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(20, 32, 45, 0.08);
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.18; letter-spacing: 0; }
+    h1 { font-size: 46px; max-width: 900px; }
+    h2 { font-size: 29px; padding-bottom: 10px; margin-bottom: 16px; border-bottom: 3px solid var(--ink); }
+    h3 { font-size: 18px; margin: 12px 0 7px; }
+    p { font-size: 16px; margin: 7px 0; }
+    ul { margin: 8px 0 0 19px; padding: 0; font-size: 15.5px; }
+    li { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 9px 0 12px; table-layout: fixed; }
+    th, td { border: 1px solid var(--line); padding: 6px 7px; vertical-align: top; overflow-wrap: anywhere; }
+    th { background: #edf2f7; font-weight: 700; }
+    code, .code {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      background: #f0f3f6;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 4px;
+      font-size: 0.86em;
+    }
+    .subtitle { color: var(--muted); font-size: 21px; margin-top: 18px; max-width: 900px; }
+    .date { color: var(--muted); font-size: 16px; margin-top: 36px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px;
+      background: #fbfcfd;
+    }
+    .metric { font-size: 34px; font-weight: 760; color: var(--blue); margin-bottom: 2px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .small { color: var(--muted); font-size: 13.5px; }
+    .term {
+      border-left: 4px solid var(--teal);
+      padding: 8px 10px;
+      background: #fbfcfd;
+      margin: 8px 0;
+    }
+    .term b { display: block; font-size: 15px; margin-bottom: 3px; }
+    .term p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.32; }
+    .ok { color: var(--green); font-weight: 700; }
+    .warn { color: var(--amber); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .num { text-align: right; white-space: nowrap; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 100px;
+      gap: 10px;
+      align-items: center;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .track { height: 18px; border-radius: 4px; background: #e9eef4; overflow: hidden; }
+    .bar { height: 100%; background: var(--blue); }
+    .bar.green { background: var(--green); }
+    .bar.amber { background: var(--amber); }
+    .bar.red { background: var(--red); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .step {
+      min-height: 116px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px;
+      background: #f9fbfd;
+    }
+    .step b { display: block; color: var(--teal); margin-bottom: 6px; }
+    .tight table { font-size: 12.5px; }
+    .tight th, .tight td { padding: 5px 6px; }
+    .formula {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      background: #f7f9fb;
+      border: 1px solid var(--line);
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    @media print {
+      @page { size: 1120px 720px; margin: 0; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { background: #fff; }
+      .deck { padding: 0; transform: none !important; }
+      .slide { margin: 0; box-shadow: none; border: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-viewport">
+    <main class="deck" id="deck">
+      <section class="slide title-slide">
+        <h1>GSSM1km 서버 저장 시간·비용 추정</h1>
+        <p class="subtitle">산출물 정확도 평가 제외. 연구실 서버에 원본 archive와 확장 산출물을 저장하는 운영 규모 추정.</p>
+        <p class="date">2026-05-28</p>
+      </section>
+
+      <section class="slide">
+        <h2>범위</h2>
+        <div class="grid-2">
+          <div class="card">
+            <div class="metric">저장</div>
+            <div class="label">이 자료의 대상</div>
+            <p>다운로드, 서버 저장, 검증, 압축 해제, 분석용 재구성에 필요한 시간과 용량.</p>
+          </div>
+          <div class="card">
+            <div class="metric">제외</div>
+            <div class="label">이 자료에서 다루지 않음</div>
+            <p>SM 정확도, LST 오차, 모델 재현성, 지상관측 검증 결과.</p>
+          </div>
+        </div>
+        <div class="flow">
+          <div class="step"><b>TPDC 원본</b>2000-2020 공식 archive<br><span class="small">서버 보관</span></div>
+          <div class="step"><b>확장 산출</b>2021-2024 자체 생성<br><span class="small">GEE 계산 후 저장</span></div>
+          <div class="step"><b>검증</b>파일 크기·coverage<br><span class="small">데이터 무결성</span></div>
+          <div class="step"><b>재구성</b>COG 또는 Zarr<br><span class="small">분석 접근성</span></div>
+          <div class="step"><b>백업</b>선택적 2차 보관<br><span class="small">장기 안정성</span></div>
+        </div>
+        <p class="small">핵심 질문: “서버에 얼마나 큰 공간이 필요하고, 저장 완료까지 며칠이 필요한가.”</p>
+      </section>
+
+      <section class="slide">
+        <h2>2000-2020 공식 archive 규모</h2>
+        <div class="grid-4">
+          <div class="card">
+            <div class="metric">231</div>
+            <div class="label">ZIP files</div>
+            <p class="small">11 spatial partitions × 21 years</p>
+          </div>
+          <div class="card">
+            <div class="metric">1.71 TB</div>
+            <div class="label">Decimal size</div>
+            <p class="small">1,710,683,131,495 bytes</p>
+          </div>
+          <div class="card">
+            <div class="metric">1.56 TiB</div>
+            <div class="label">Binary size</div>
+            <p class="small">서버 파일시스템 표시 기준에 가까움</p>
+          </div>
+          <div class="card">
+            <div class="metric">11</div>
+            <div class="label">Partitions</div>
+            <p class="small">Europe, Africa, Australia, Oceania, Americas, Asia1-4</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>확인 항목</th>
+              <th>결과</th>
+              <th>저장 관점 해석</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>연도 coverage</td>
+              <td>2000-2020 전체</td>
+              <td>7,671일 coverage 검증 가능</td>
+            </tr>
+            <tr>
+              <td>파일 형식</td>
+              <td>region-year ZIP + bandNames xlsx</td>
+              <td>231개 단위로 재시작·검증 관리</td>
+            </tr>
+            <tr>
+              <td>다운로드 경로</td>
+              <td>TPDC FTP 목록 접근 확인</td>
+              <td>GEE export 없이 원본 archive 저장 가능</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="slide tight">
+        <h2>2000-2020 다운로드 시간</h2>
+        <div class="grid-2">
+          <div>
+            <div class="bar-row"><span>20 Mbps</span><div class="track"><div class="bar red" style="width:100%"></div></div><span>7.9일</span></div>
+            <div class="bar-row"><span>50 Mbps</span><div class="track"><div class="bar amber" style="width:40%"></div></div><span>3.2일</span></div>
+            <div class="bar-row"><span>100 Mbps</span><div class="track"><div class="bar green" style="width:20%"></div></div><span>1.6일</span></div>
+            <div class="bar-row"><span>200 Mbps</span><div class="track"><div class="bar green" style="width:10%"></div></div><span>19시간</span></div>
+            <div class="formula">1,710,683,131,495 bytes × 8 / 실효 네트워크 속도</div>
+          </div>
+          <div class="card">
+            <div class="metric">4일-2주</div>
+            <div class="label">운영 일정</div>
+            <p>FTP 병렬 다운로드, 서버 I/O, 재접속, 일부 파일 재시도, size 검증 포함.</p>
+            <p class="small">순수 전송 시간보다 운영 일정이 길어지는 이유는 파일 단위 검증과 실패 복구.</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>단계</th>
+              <th class="num">소요</th>
+              <th>근거</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>file list/manifest 저장</td><td class="num">&lt;1일</td><td>TPDC API에서 232개 파일 목록 확보 가능</td></tr>
+            <tr><td>FTP 다운로드</td><td class="num">2-10일</td><td>실효 20-100 Mbps, 231개 ZIP</td></tr>
+            <tr><td>파일 크기 검증</td><td class="num">0.5-1일</td><td>manifest size와 로컬 크기 비교</td></tr>
+            <tr><td>압축 해제·재구성</td><td class="num">1-3일+</td><td>서버 디스크 I/O와 재구성 형식에 의존</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="slide">
+        <h2>2000-2020 저장 용량과 비용 산식</h2>
+        <div class="grid-3">
+          <div class="card">
+            <div class="metric">2 TB</div>
+            <div class="label">최소</div>
+            <p>원본 ZIP 1 copy만 보관. 여유 공간이 작아 운영 중단 위험 존재.</p>
+          </div>
+          <div class="card">
+            <div class="metric">4-6 TB</div>
+            <div class="label">권장</div>
+            <p>원본 ZIP + 압축 해제/재구성 작업 공간 + 검증 산출물.</p>
+          </div>
+          <div class="card">
+            <div class="metric">8-12 TB</div>
+            <div class="label">백업 포함</div>
+            <p>원본 archive와 분석용 copy를 분리하고 1회 backup까지 고려.</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>비용 항목</th>
+              <th>산식</th>
+              <th>예시</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>서버 여유공간 사용</td>
+              <td>신규 장비 구매 없음</td>
+              <td>직접 비용 0, 운영 시간만 발생</td>
+            </tr>
+            <tr>
+              <td>스토리지 증설</td>
+              <td>필요 usable TB × 기관 구매 단가/TB</td>
+              <td>8 TB usable이면 8 × 단가/TB</td>
+            </tr>
+            <tr>
+              <td>백업 보관</td>
+              <td>운영 copy와 동일하거나 0.5-1.0배 추가</td>
+              <td>4 TB 운영 copy + 4 TB backup = 8 TB급 계획</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small">이 자료는 구매 견적서가 아니라 용량 산정 문서. 실제 비용은 연구실 서버의 기존 여유공간과 기관 구매 단가로 확정.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>2021-2024 확장 산출물 저장 규모</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>보관 범위</th>
+              <th>용량 추정</th>
+              <th>계산 근거</th>
+              <th>용도</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>최종 SM만 보관</td>
+              <td class="num">약 0.30 TiB</td>
+              <td>공식 archive 1.56 TiB × 4/21</td>
+              <td>배포·검증용 최소 산출물</td>
+            </tr>
+            <tr>
+              <td>SM + LST_DAILY/LST_Diff</td>
+              <td class="num">약 0.9 TiB</td>
+              <td>SM 1 band + LST 2 bands</td>
+              <td>LST predictor 추적 가능</td>
+            </tr>
+            <tr>
+              <td>SM + day/night 포함 LST</td>
+              <td class="num">약 1.5 TiB</td>
+              <td>SM 1 band + LST 4 bands</td>
+              <td>day/night 재검증 가능</td>
+            </tr>
+            <tr>
+              <td>작업 공간 포함</td>
+              <td class="num">3-6 TiB</td>
+              <td>download/export temp, 재시도, local copy 포함</td>
+              <td>안정적 production 운영</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>해석</b>
+          <p>최종 SM만 저장하면 크기는 작다. 하지만 LST 중간산출물을 보관하면 재현성과 재검증은 좋아지고 저장 공간은 빠르게 증가.</p>
+        </div>
+      </section>
+
+      <section class="slide tight">
+        <h2>2021-2024 GEE 산출 시간 근거</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>관측된 Europe task</th>
+              <th class="num">실제 시간</th>
+              <th>전지구 환산 근거</th>
+              <th>운영 해석</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>C6.1→C6 보정</td>
+              <td class="num">0.38-0.39 h</td>
+              <td>Europe 대비 전지구 약 10.2배</td>
+              <td>수 시간-1일 규모. 주 병목 아님.</td>
+            </tr>
+            <tr>
+              <td>legacy ContinuousLST TFA</td>
+              <td class="num">최대 1.09 h</td>
+              <td>전지구 단순 환산 약 11 h 하한</td>
+              <td>고정 UTC 방식은 비교적 안정.</td>
+            </tr>
+            <tr>
+              <td>pixel-time MODIS TFA smoke</td>
+              <td class="num">5.4-6.5 h</td>
+              <td>Europe 2년 smoke. full baseline·전지구 적용 시 증가</td>
+              <td>주 병목 후보.</td>
+            </tr>
+            <tr>
+              <td>pixel-time CFS TFA smoke</td>
+              <td class="num">8.8 h 시점 running</td>
+              <td>재시도 2-3회 관측</td>
+              <td>계산 방식 최적화 필요.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>공간 배율</b>
+          <p>TPDC archive 기준 Europe 21년 총량 약 156 GiB, 전지구 총량 약 1593 GiB. 전지구 규모는 Europe의 약 10.2배.</p>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>2021-2024 저장 완료까지의 시간</h2>
+        <div class="grid-3">
+          <div class="card">
+            <div class="metric">1-3주</div>
+            <div class="label">LST precompute</div>
+            <p>pixel-time TFA와 CFS anomaly 산출. 현재 가장 큰 불확실성.</p>
+          </div>
+          <div class="card">
+            <div class="metric">3-7일</div>
+            <div class="label">SM export</div>
+            <p>전처리 asset 준비 후 tile-year 단위 최종 SM 저장.</p>
+          </div>
+          <div class="card">
+            <div class="metric">1-4일</div>
+            <div class="label">서버 복사·검증</div>
+            <p>최종 SM만이면 작고, LST 포함 시 1 TiB 이상.</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>시나리오</th>
+              <th class="num">기간</th>
+              <th>조건</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>최종 SM만 저장</td><td class="num">2-4주</td><td>LST 중간산출물 보관 최소화, export 안정</td></tr>
+            <tr><td>SM + 핵심 LST predictor 저장</td><td class="num">4-8주</td><td>pixel-time LST, 재시도, 검증 포함</td></tr>
+            <tr><td>SM + day/night LST + 작업 copy 저장</td><td class="num">6-10주</td><td>전지구 초기 production, queue와 재실행 포함</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="slide">
+        <h2>서버 저장 운영안</h2>
+        <div class="flow">
+          <div class="step"><b>1</b>TPDC 원본 ZIP<br><span class="small">읽기 전용 보관</span></div>
+          <div class="step"><b>2</b>checksum/size manifest<br><span class="small">재시작 기준</span></div>
+          <div class="step"><b>3</b>분석용 COG/Zarr<br><span class="small">필요 범위 생성</span></div>
+          <div class="step"><b>4</b>2021+ 산출물<br><span class="small">버전별 분리</span></div>
+          <div class="step"><b>5</b>백업 정책<br><span class="small">원본 우선</span></div>
+        </div>
+        <div class="grid-2">
+          <div class="term">
+            <b>추천 저장 원칙</b>
+            <p>원본 ZIP은 수정하지 않고 보존. 분석용 파일은 재생성 가능하도록 manifest와 산출 코드 버전을 함께 기록.</p>
+          </div>
+          <div class="term">
+            <b>삭제 가능한 대상</b>
+            <p>GEE export 임시 파일, 부분 산출물, 재구성 중간파일. 원본 TPDC archive와 최종 산출물은 삭제 대상에서 제외.</p>
+          </div>
+        </div>
+        <p class="small">비용을 낮추려면 “원본 archive + 최종 SM”을 우선 저장하고, LST 중간산출물은 검증이 끝난 범위부터 선택 보관.</p>
+      </section>
+
+      <section class="slide">
+        <h2>의사결정용 요약</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>질문</th>
+              <th>현재 추정</th>
+              <th>결정에 필요한 값</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>공식 2000-2020을 서버에 받을 수 있는가</td>
+              <td>가능. TPDC FTP archive 확인.</td>
+              <td>서버 실효 대역폭과 저장 위치</td>
+            </tr>
+            <tr>
+              <td>다운로드 완료까지 얼마나 걸리는가</td>
+              <td>4일-2주</td>
+              <td>FTP 병렬 수, 네트워크 안정성</td>
+            </tr>
+            <tr>
+              <td>최소 저장 공간</td>
+              <td>원본만 2 TB, 운영 권장 4-6 TB</td>
+              <td>압축 해제본과 분석용 copy 보관 여부</td>
+            </tr>
+            <tr>
+              <td>2021-2024까지 포함한 운영 공간</td>
+              <td>최소 3-4 TB, LST 포함 6 TB 이상 권장</td>
+              <td>LST 중간산출물 보관 범위</td>
+            </tr>
+            <tr>
+              <td>비용 산정 방식</td>
+              <td>필요 usable TB × 기관 구매 단가/TB</td>
+              <td>기존 서버 여유공간 또는 신규 디스크 단가</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>실행 전 확인값</b>
+          <p>서버의 실제 빈 공간, FTP 실효 속도, 백업 필요 여부, LST 중간산출물 보관 범위. 이 네 값이 확정되면 비용 범위도 좁아짐.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    function fitDeck() {
+      const deck = document.getElementById('deck');
+      const width = Math.min(window.innerWidth, 1120);
+      const scale = width / 1120;
+      deck.style.transform = `scale(${scale})`;
+      deck.style.marginBottom = `${(scale - 1) * deck.offsetHeight}px`;
+    }
+    window.addEventListener('resize', fitDeck);
+    window.addEventListener('load', fitDeck);
+  </script>
+</body>
+</html>
