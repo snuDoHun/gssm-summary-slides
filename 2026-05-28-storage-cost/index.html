@@ -266,46 +266,28 @@
       </section>
 
       <section class="slide">
-        <h2>2000-2020 저장 용량과 비용 산식</h2>
-        <div class="grid-2">
+        <h2>2000-2020 저장 용량</h2>
+        <div class="grid-3">
+          <div class="card">
+            <div class="metric">1.56 TiB</div>
+            <div class="label">원본 archive</div>
+            <p>TPDC에서 받은 region-year ZIP 231개 자체의 크기.</p>
+          </div>
           <div class="card">
             <div class="metric">2 TB</div>
-            <div class="label">최소</div>
-            <p>원본 ZIP 1 copy만 보관. 여유 공간이 작아 운영 중단 위험 존재.</p>
+            <div class="label">최소 확보 공간</div>
+            <p>원본 ZIP을 서버에 저장하고 파일 크기 검증까지 수행.</p>
           </div>
           <div class="card">
             <div class="metric">4-6 TB</div>
-            <div class="label">권장</div>
-            <p>원본 ZIP + 압축 해제/재구성 작업 공간 + 검증 산출물.</p>
+            <div class="label">작업 포함 권장</div>
+            <p>원본 보관, 압축 해제, 분석용 파일 생성, 재시도 파일을 동시에 처리.</p>
           </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>비용 항목</th>
-              <th>산식</th>
-              <th>예시</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>서버 여유공간 사용</td>
-              <td>신규 장비 구매 없음</td>
-              <td>직접 비용 0, 운영 시간만 발생</td>
-            </tr>
-            <tr>
-              <td>스토리지 증설</td>
-              <td>필요 usable TB × 기관 구매 단가/TB</td>
-              <td>8 TB usable이면 8 × 단가/TB</td>
-            </tr>
-            <tr>
-              <td>임시 작업 공간</td>
-              <td>압축 해제본과 재구성본을 동시에 둘 수 있는 여유공간</td>
-              <td>원본 1.56 TiB 외에 2-4 TiB 추가 확보</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="small">이 자료는 구매 견적서가 아니라 용량 산정 문서. 실제 비용은 연구실 서버의 기존 여유공간과 기관 구매 단가로 확정.</p>
+        <div class="term">
+          <b>해석</b>
+          <p>원본을 단순 저장하면 2 TB 수준으로 가능. 압축 해제와 분석용 재구성을 같은 서버에서 진행하려면 4-6 TB 여유 공간이 필요.</p>
+        </div>
       </section>
 
       <section class="slide tight">
@@ -462,16 +444,11 @@
               <td>최소 3-4 TB, LST 포함 6 TB 이상 권장</td>
               <td>LST 중간산출물 보관 범위</td>
             </tr>
-            <tr>
-              <td>비용 산정 방식</td>
-              <td>필요 usable TB × 기관 구매 단가/TB</td>
-              <td>기존 서버 여유공간 또는 신규 디스크 단가</td>
-            </tr>
           </tbody>
         </table>
         <div class="term">
           <b>실행 전 확인값</b>
-          <p>서버의 실제 빈 공간, FTP 실효 속도, LST 중간산출물 보관 범위. 이 값이 확정되면 비용 범위도 좁아짐.</p>
+          <p>서버의 실제 빈 공간, FTP 실효 속도, LST 중간산출물 보관 범위. 이 값이 확정되면 저장 일정과 필요 공간을 더 좁게 산정 가능.</p>
         </div>
       </section>
     </main>
