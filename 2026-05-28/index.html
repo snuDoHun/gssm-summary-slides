@@ -149,6 +149,14 @@
     .tight th, .tight td { padding: 5px 6px; }
     .mini { font-size: 12.5px; }
     @media print {
+      @page {
+        size: 1120px 720px;
+        margin: 0;
+      }
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
       body { background: #fff; }
       .deck { padding: 0; transform: none !important; }
       .slide { margin: 0; box-shadow: none; border: 0; }
@@ -244,6 +252,51 @@
           <p>전지구 전체를 단일 asset으로 만들지 않고, 공간 tile과 연도 단위로 나눠 export하는 방식. 실패 복구와 저장 관리에 유리.</p>
         </div>
         <p class="small">전제: 2000-2020 공식 GSSM은 그대로 사용. 새로 만드는 것은 2021-2024 확장 기간.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>공식 GSSM 2000-2020 로컬 보관 예상</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>다운로드 경로</th>
+              <th>방법</th>
+              <th class="num">예상 기간</th>
+              <th>판단</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>공식 archive 직접 수령</td>
+              <td>TPDC 등 공식 배포처에서 전체 package를 연구실 서버로 직접 다운로드. 원본 파일, checksum, metadata 함께 보관.</td>
+              <td class="num">1-2주</td>
+              <td>전체 archive 접근 권한과 안정적인 서버 다운로드가 확보될 때 우선 경로.</td>
+            </tr>
+            <tr>
+              <td>GEE asset export</td>
+              <td>공식 GSSM asset을 continent-year 또는 tile-year 단위로 나눠 export 후 서버에 저장.</td>
+              <td class="num">3-7주</td>
+              <td>공식 archive 직접 다운로드가 제한될 때 대안. GEE queue와 재시도 영향 큼.</td>
+            </tr>
+            <tr>
+              <td>Figshare</td>
+              <td>metadata와 공개 sample 파일 확인. 전지구 전체 archive 확보 경로로는 제한적.</td>
+              <td class="num">&lt;1일</td>
+              <td>구조 확인과 문서화 용도. 전체 2000-2020 로컬 보관 경로로 보기는 어려움.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="grid-2">
+          <div class="term">
+            <b>권장 절차</b>
+            <p>공식 archive 접근 가능성 확인 → 서버 직접 다운로드 → checksum 검증 → 7,671일 coverage 확인 → 분석용 COG 또는 Zarr로 재구성.</p>
+          </div>
+          <div class="term">
+            <b>저장 규모</b>
+            <p>compressed int16 기준 대략 0.5-2 TB 범위. float32 또는 일별 global GeoTIFF 단순 저장은 수 TB까지 증가 가능.</p>
+          </div>
+        </div>
+        <p class="small">GEE point sampling 코드는 full raster archive 저장용이 아님. 로컬 보관은 원본 archive 보존과 분석용 재구성을 분리하는 방식이 적절.</p>
       </section>
 
       <section class="slide tight">
