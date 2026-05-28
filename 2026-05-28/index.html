@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSSM1km 2021-2024 전지구 확장 중간보고 - 2026-05-28</title>
+  <style>
+    :root {
+      --ink: #16202a;
+      --muted: #5b6875;
+      --line: #d8dee6;
+      --bg: #f5f7fa;
+      --paper: #ffffff;
+      --blue: #1f6fb2;
+      --teal: #137f7f;
+      --green: #2f8f46;
+      --amber: #ad7417;
+      --red: #c0392b;
+      --slide-w: 1120px;
+      --slide-h: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      line-height: 1.42;
+      overflow-x: hidden;
+    }
+    .deck-viewport {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .deck {
+      width: var(--slide-w);
+      flex: 0 0 var(--slide-w);
+      padding: 24px 0;
+      transform-origin: top center;
+    }
+    .slide {
+      width: var(--slide-w);
+      height: var(--slide-h);
+      margin: 0 0 24px;
+      padding: 34px 44px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(20, 32, 45, 0.08);
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.18; letter-spacing: 0; }
+    h1 { font-size: 45px; max-width: 920px; }
+    h2 { font-size: 28px; padding-bottom: 10px; margin-bottom: 15px; border-bottom: 3px solid var(--ink); }
+    h3 { font-size: 18px; margin: 12px 0 7px; }
+    p { font-size: 16px; margin: 7px 0; }
+    ul { margin: 7px 0 0 19px; padding: 0; font-size: 15.5px; }
+    li { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 9px 0 12px; table-layout: fixed; }
+    th, td { border: 1px solid var(--line); padding: 6px 7px; vertical-align: top; overflow-wrap: anywhere; }
+    th { background: #edf2f7; font-weight: 700; }
+    .num { text-align: right; white-space: nowrap; }
+    .subtitle { color: var(--muted); font-size: 21px; margin-top: 18px; max-width: 900px; }
+    .date { color: var(--muted); font-size: 16px; margin-top: 36px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px;
+      background: #fbfcfd;
+    }
+    .metric { font-size: 31px; font-weight: 750; color: var(--blue); margin-bottom: 2px; }
+    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .term {
+      border-left: 4px solid var(--teal);
+      padding: 8px 10px;
+      background: #fbfcfd;
+      margin: 8px 0;
+    }
+    .term b { display: block; font-size: 15px; margin-bottom: 3px; }
+    .term p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.32; }
+    .ok { color: var(--green); font-weight: 700; }
+    .warn { color: var(--amber); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+    .small { color: var(--muted); font-size: 13.5px; }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin: 2px 4px 2px 0;
+      background: #f4f7fa;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    code, .code {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      background: #f0f3f6;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 4px;
+      font-size: 0.86em;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .step {
+      min-height: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px;
+      background: #f9fbfd;
+    }
+    .step b { display: block; color: var(--teal); margin-bottom: 6px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 105px;
+      gap: 10px;
+      align-items: center;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .track { height: 18px; border-radius: 4px; background: #e9eef4; overflow: hidden; }
+    .bar { height: 100%; background: var(--blue); }
+    .bar.green { background: var(--green); }
+    .bar.amber { background: var(--amber); }
+    .bar.red { background: var(--red); }
+    .footer {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+    .tight table { font-size: 12.4px; }
+    .tight th, .tight td { padding: 5px 6px; }
+    .mini { font-size: 12.5px; }
+    @media print {
+      body { background: #fff; }
+      .deck { padding: 0; transform: none !important; }
+      .slide { margin: 0; box-shadow: none; border: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-viewport">
+    <main class="deck" id="deck">
+      <section class="slide title-slide">
+        <h1>GSSM1km 2021-2024 전지구 확장 중간보고</h1>
+        <p class="subtitle">공식 GSSM 2000-2020은 그대로 두고, 2021년 이후 확장 산출물을 만드는 전략</p>
+        <p class="date">2026-05-28</p>
+      </section>
+
+      <section class="slide">
+        <h2>핵심 결론</h2>
+        <div class="grid-2">
+          <div class="card">
+            <div class="metric">4-8주</div>
+            <div class="label">2021-2024 전지구 확장 예상</div>
+            <p>공식 GSSM 2000-2020은 수정하지 않고, 2021-2024만 새로 산출하는 기준 일정 추정.</p>
+            <p class="small">LST pixel-time 전처리, MODIS C6.1 보정, 검증 포함.</p>
+          </div>
+          <div class="card">
+            <div class="metric">0.60 / 0.94 ℃</div>
+            <div class="label">현재 LST benchmark raw-gap RMSE</div>
+            <p>Europe author asset 대비 월별 window 2012-2020 평균.</p>
+            <p class="small">앞: <code>LST_DAILY</code>, 뒤: <code>LST_Diff</code>. raw MODIS valid pixel은 관측값과 거의 일치.</p>
+          </div>
+        </div>
+        <div class="term">
+          <b>확장 산출물</b>
+          <p>공식 GSSM 산출물과 구분되는 2021년 이후 확장 산출물. 같은 predictor 구조와 검증 체계를 사용.</p>
+        </div>
+        <ul>
+          <li>주요 기술 이슈: gap-filled LST와 MODIS version 전환.</li>
+          <li>주요 운영 이슈: GEE asset quota, export queue, 전지구 1 km daily export 단위 설계.</li>
+          <li>최종 판단 기준: <code>LST_DAILY</code>뿐 아니라 <code>LST_Diff</code>와 2020-2021 경계 연속성.</li>
+        </ul>
+      </section>
+
+      <section class="slide">
+        <h2>현재 목표와 범위</h2>
+        <div class="flow">
+          <div class="step"><b>2000-2020</b>공식 GSSM asset 사용<br><span class="small">수정 없음</span></div>
+          <div class="step"><b>2021-2024</b>동일 predictor 체계로 새 산출<br><span class="small">전지구 1 km daily</span></div>
+          <div class="step"><b>LST 보정</b>C6.1을 C6 기준값에 맞춤<br><span class="small">day/night 별도</span></div>
+          <div class="step"><b>SM 추론</b>RF 모델 적용<br><span class="small">학습자료 일관성 필요</span></div>
+          <div class="step"><b>검증</b>경계·외부자료·지상관측<br><span class="small">official 아님 명시</span></div>
+        </div>
+        <div class="term">
+          <b>공식 GSSM asset</b>
+          <p>저자가 공개한 2000-2020 daily 1 km 표층토양수분 산출물. 이 기간은 재생산해서 덮어쓰지 않음.</p>
+        </div>
+        <p>목표: 공식 산출물의 완전한 복제가 아니라, 공식 산출물 이후 기간을 검증 가능한 방식으로 확장.</p>
+      </section>
+
+      <section class="slide">
+        <h2>2021-2024 전지구 산출 예상 시간</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>시나리오</th>
+              <th>가정</th>
+              <th class="num">예상 기간</th>
+              <th>해석</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>단축 시나리오</td>
+              <td>LST/NDVI/EVI 전처리 안정, export 실패 적음</td>
+              <td class="num">2-4주</td>
+              <td>테스트 통과 후 tile-year export가 안정적으로 완료되는 경우.</td>
+            </tr>
+            <tr>
+              <td>기준 시나리오</td>
+              <td>pixel-time LST, C6.1 보정, 검증 포함</td>
+              <td class="num">4-8주</td>
+              <td>현재 기준 추정치. 검증과 재시도 일부 포함.</td>
+            </tr>
+            <tr>
+              <td>지연 시나리오</td>
+              <td>GEE quota, queue, 일부 region 재시도, 서버 저장 정리 포함</td>
+              <td class="num">6-10주</td>
+              <td>전지구 산출 초기 실행에서 필요한 상한 추정.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>tile-year export</b>
+          <p>전지구 전체를 단일 asset으로 만들지 않고, 공간 tile과 연도 단위로 나눠 export하는 방식. 실패 복구와 저장 관리에 유리.</p>
+        </div>
+        <p class="small">전제: 2000-2020 공식 GSSM은 그대로 사용. 새로 만드는 것은 2021-2024 확장 기간.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>구성 요소별 기간 추정</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th>주요 내용</th>
+              <th class="num">예상 기간</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LST 산출 방식 확정</td>
+              <td>pixel-time CFS anomaly, MODIS view-time fallback</td>
+              <td class="num">3-7일</td>
+              <td><span class="warn">소규모 사례에서 검토 중</span></td>
+            </tr>
+            <tr>
+              <td>LST 2021-2024 생성</td>
+              <td>MODIS day/night, CFSv2 anomaly, C6.1 보정</td>
+              <td class="num">1-3주</td>
+              <td>주요 병목</td>
+            </tr>
+            <tr>
+              <td>NDVI/EVI</td>
+              <td>Savitzky-Golay smoothing + daily interpolation</td>
+              <td class="num">3-10일</td>
+              <td>기본 전처리 경로 확보, C6/C6.1 차이 평가 필요</td>
+            </tr>
+            <tr>
+              <td>SM inference/export</td>
+              <td>18 predictor 구성, RF 적용, tile-year 저장</td>
+              <td class="num">1-2주</td>
+              <td>전처리 asset 준비 후 진행</td>
+            </tr>
+            <tr>
+              <td>검증/report</td>
+              <td>2020-2021 경계, 외부 LST, in-situ SM 비교</td>
+              <td class="num">1-2주</td>
+              <td>평가 체계 정리 중</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small">각 기간은 calendar time 기준. GEE queue 대기와 export 재시도 포함 여부에 따라 변동.</p>
+      </section>
+
+      <section class="slide">
+        <h2>확장 적용 시 검토 항목</h2>
+        <div class="grid-2">
+          <div>
+            <h3>MODIS version 전환</h3>
+            <ul>
+              <li>공식 GSSM 2000-2020은 <code>MODIS/006</code> 기반.</li>
+              <li>2021 이후 장기 운용은 <code>MODIS/061</code> 사용 필요.</li>
+              <li>day/night LST를 따로 C6 기준에 맞게 보정.</li>
+              <li>2020-2021 경계 discontinuity 평가 필요.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>LST 시간 정의</h3>
+            <ul>
+              <li>전지구에서는 같은 UTC가 모든 픽셀의 낮/밤을 대표하지 않음.</li>
+              <li>새 산출 방식은 MOD11A1 view-time을 픽셀별로 사용.</li>
+              <li>CFSv2는 local view hour를 UTC로 변환해 선형보간.</li>
+              <li>SM 날짜는 픽셀 local date 기준으로 유지.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="term">
+          <b>MODIS C6.1 보정</b>
+          <p>공식 GSSM 기간은 MODIS Collection 6 기반이고, 2021년 이후 입력은 Collection 6.1을 사용한다. 두 버전 사이의 체계적 차이가 2020-2021 경계에서 인공적인 변화로 보이지 않도록, 2018-2020 겹치는 기간에서 day/night별 차이를 추정해 2021년 이후 LST에 적용한다. day와 night을 따로 보정해야 <code>LST_Diff</code>가 유지된다.</p>
+        </div>
+      </section>
+
+      <section class="slide tight">
+        <h2>원본 저자 LST와 현재 산출물 차이</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>비교 대상</th>
+              <th>subset</th>
+              <th class="num">n</th>
+              <th class="num">Bias</th>
+              <th class="num">RMSE</th>
+              <th class="num">r</th>
+              <th>의미</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LST_DAILY</td>
+              <td>raw_valid</td>
+              <td class="num">9,443</td>
+              <td class="num">0.0002</td>
+              <td class="num">0.0476</td>
+              <td class="num">1.0000</td>
+              <td>raw MODIS 관측 보존</td>
+            </tr>
+            <tr>
+              <td>LST_Diff</td>
+              <td>raw_valid</td>
+              <td class="num">9,443</td>
+              <td class="num">-0.0008</td>
+              <td class="num">0.0749</td>
+              <td class="num">0.9999</td>
+              <td>day/night 산식 일치</td>
+            </tr>
+            <tr>
+              <td>LST_DAILY</td>
+              <td>raw_gap</td>
+              <td class="num">24,918</td>
+              <td class="num">0.0534</td>
+              <td class="num">0.5972</td>
+              <td class="num">0.9987</td>
+              <td>gap-fill 차이 존재</td>
+            </tr>
+            <tr>
+              <td>LST_Diff</td>
+              <td>raw_gap</td>
+              <td class="num">24,918</td>
+              <td class="num">-0.0307</td>
+              <td class="num">0.9446</td>
+              <td class="num">0.9859</td>
+              <td>주요 잔여 이슈</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="term">
+          <b>raw_gap</b>
+          <p>MODIS 원 관측이 없어서 gap-filled LST가 사용된 픽셀. 저자 asset과 직접 만든 LST의 차이가 주로 여기서 발생.</p>
+        </div>
+        <p class="small">월별 window 2012-2020 Europe author benchmark 기준. 전일 자료가 아니라 월별 첫 7일 표본.</p>
+      </section>
+
+      <section class="slide">
+        <h2>오차는 gap-filled 영역에 집중</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>표본 구성</h3>
+            <div class="bar-row">
+              <div>raw-valid</div>
+              <div class="track"><div class="bar green" style="width: 27.5%"></div></div>
+              <div>9,443</div>
+            </div>
+            <div class="bar-row">
+              <div>raw-gap</div>
+              <div class="track"><div class="bar amber" style="width: 72.5%"></div></div>
+              <div>24,918</div>
+            </div>
+            <p class="small">2012-2020 Europe 월별 window 표본. raw-valid는 MODIS 원 관측이 있는 픽셀, raw-gap은 gap-filled LST가 사용된 픽셀.</p>
+          </div>
+          <div class="card">
+            <h3>상관성</h3>
+            <p><span class="ok">raw-valid</span>: <code>LST_DAILY r=1.0000</code>, <code>LST_Diff r=0.9999</code></p>
+            <p><span class="warn">raw-gap</span>: <code>LST_DAILY r=0.9987</code>, <code>LST_Diff r=0.9859</code></p>
+            <p class="small">상관성은 높지만, gap-filled 영역에서는 RMSE가 커짐. 특히 day-night contrast인 <code>LST_Diff</code>에서 차이가 큼.</p>
+          </div>
+        </div>
+        <h3>RMSE 비교</h3>
+        <div class="bar-row">
+          <div>LST_DAILY raw-valid</div>
+          <div class="track"><div class="bar green" style="width: 8%"></div></div>
+          <div>0.048 ℃</div>
+        </div>
+        <div class="bar-row">
+          <div>LST_DAILY raw-gap</div>
+          <div class="track"><div class="bar amber" style="width: 63%"></div></div>
+          <div>0.597 ℃</div>
+        </div>
+        <div class="bar-row">
+          <div>LST_Diff raw-valid</div>
+          <div class="track"><div class="bar green" style="width: 8%"></div></div>
+          <div>0.075 ℃</div>
+        </div>
+        <div class="bar-row">
+          <div>LST_Diff raw-gap</div>
+          <div class="track"><div class="bar red" style="width: 100%"></div></div>
+          <div>0.945 ℃</div>
+        </div>
+        <div class="footer">해석: MODIS 원 관측을 읽고 결합하는 부분은 저자 산출물과 거의 일치. 잔여 차이는 gap-filled LST 산출 방식에서 주로 발생.</div>
+      </section>
+
+      <section class="slide">
+        <h2>계절별로는 겨울-초봄 LST_Diff 오차가 큼</h2>
+        <div class="grid-2">
+          <div>
+            <h3>LST_DAILY raw-gap RMSE</h3>
+            <div class="bar-row">
+              <div>DJF</div>
+              <div class="track"><div class="bar amber" style="width: 94%"></div></div>
+              <div>0.689 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>MAM</div>
+              <div class="track"><div class="bar amber" style="width: 85%"></div></div>
+              <div>0.626 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>JJA</div>
+              <div class="track"><div class="bar green" style="width: 66%"></div></div>
+              <div>0.484 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>SON</div>
+              <div class="track"><div class="bar green" style="width: 75%"></div></div>
+              <div>0.547 ℃</div>
+            </div>
+          </div>
+          <div>
+            <h3>LST_Diff raw-gap RMSE</h3>
+            <div class="bar-row">
+              <div>DJF</div>
+              <div class="track"><div class="bar red" style="width: 100%"></div></div>
+              <div>1.106 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>MAM</div>
+              <div class="track"><div class="bar red" style="width: 88%"></div></div>
+              <div>0.972 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>JJA</div>
+              <div class="track"><div class="bar green" style="width: 66%"></div></div>
+              <div>0.735 ℃</div>
+            </div>
+            <div class="bar-row">
+              <div>SON</div>
+              <div class="track"><div class="bar amber" style="width: 80%"></div></div>
+              <div>0.883 ℃</div>
+            </div>
+          </div>
+        </div>
+        <div class="term">
+          <b>왜 LST_Diff를 따로 보는가</b>
+          <p><code>LST_Diff</code>는 낮과 밤의 열적 대비를 나타내는 predictor. 평균 온도인 <code>LST_DAILY</code>가 유사해도 day/night 차이가 다르면 SM 모델 입력은 달라질 수 있음.</p>
+        </div>
+        <p class="small">월별 최댓값은 2-3월. <code>LST_Diff</code> RMSE는 February 1.201 ℃, March 1.208 ℃.</p>
+      </section>
+
+      <section class="slide">
+        <h2>차이 원인: 배제 항목과 잔여 후보</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>가능성이 낮은 항목</h3>
+            <ul>
+              <li>단위 변환과 scale factor.</li>
+              <li><code>LST_DAILY=(day+night)/2</code> 식.</li>
+              <li><code>LST_Diff=day-night</code> 식.</li>
+              <li>raw MODIS blend 동작.</li>
+              <li>Aqua <code>MYD11A1</code> 가능성.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>가능성이 큰 원인</h3>
+            <ul>
+              <li>CFSv2 anomaly 기준기간 차이.</li>
+              <li>원본 LST intermediate asset 미공개.</li>
+              <li>projection, footprint, export pyramiding 세부 차이.</li>
+              <li>저장 전 rounding 또는 후처리.</li>
+              <li>겨울/초봄 snow/frozen 조건.</li>
+            </ul>
+          </div>
+        </div>
+        <p>해석: 저자 Europe LST와 완전 동일한 재현은 제한적. raw MODIS 신호는 보존되며, gap-filled 영역의 오차는 계절과 기준기간 설정에 민감.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>CFSv2 기준기간 테스트 결과</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>기간</th>
+              <th>변수</th>
+              <th>기준기간</th>
+              <th class="num">Bias</th>
+              <th class="num">RMSE</th>
+              <th class="num">r</th>
+              <th>판단</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2012-01</td>
+              <td>LST_DAILY</td>
+              <td>2002-2020</td>
+              <td class="num">-0.2202</td>
+              <td class="num">0.5568</td>
+              <td class="num">0.9975</td>
+              <td>기준</td>
+            </tr>
+            <tr>
+              <td>2012-01</td>
+              <td>LST_DAILY</td>
+              <td>1979-2020</td>
+              <td class="num">0.1986</td>
+              <td class="num">0.5343</td>
+              <td class="num">0.9978</td>
+              <td>소폭 개선</td>
+            </tr>
+            <tr>
+              <td>2012-07</td>
+              <td>LST_DAILY</td>
+              <td>2002-2020</td>
+              <td class="num">-0.3668</td>
+              <td class="num">0.5647</td>
+              <td class="num">0.9969</td>
+              <td>기준</td>
+            </tr>
+            <tr>
+              <td>2012-07</td>
+              <td>LST_DAILY</td>
+              <td>1979-2020</td>
+              <td class="num">0.0211</td>
+              <td class="num">0.2708</td>
+              <td class="num">0.9989</td>
+              <td><span class="ok">큰 개선</span></td>
+            </tr>
+            <tr>
+              <td>2012-07</td>
+              <td>LST_Diff</td>
+              <td>1979-2020</td>
+              <td class="num">-0.0567</td>
+              <td class="num">0.5145</td>
+              <td class="num">0.9944</td>
+              <td><span class="ok">현 최선</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small">해석: CFSv2 기준기간은 주요 원인 후보. 1월 오차가 남아 겨울 조건, projection, 후처리 차이도 검토 필요.</p>
+      </section>
+
+      <section class="slide">
+        <h2>전지구 적용을 위해 바꾼 점</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Pixel-time LST</h3>
+            <p>각 픽셀의 MODIS 실제 관측시각을 사용.</p>
+            <p class="small">고정 UTC 방식의 경도별 낮/밤 혼동 방지.</p>
+          </div>
+          <div class="card">
+            <h3>산출 단위</h3>
+            <p>전지구 단일 asset보다 tile-year 단위가 적합.</p>
+            <p class="small">실패 복구와 연구실 서버 저장 관리에 유리.</p>
+          </div>
+          <div class="card">
+            <h3>Training 재생성</h3>
+            <p>local-time predictor를 쓰면 sample predictor도 다시 추출.</p>
+            <p class="small">공식 sample에 저장된 기존 predictor와 혼용되지 않도록 분리.</p>
+          </div>
+        </div>
+        <div class="term">
+          <b>Pixel-time</b>
+          <p>전지구에서 “낮 10:30”을 하나의 UTC로 고정하지 않고, 각 픽셀의 경도와 MODIS 관측시각에 맞춰 CFSv2를 샘플링하는 방식.</p>
+        </div>
+        <p>전지구 적용에서는 시간 정의를 먼저 고정한 뒤, LST와 SM 검증을 순차적으로 해석.</p>
+      </section>
+
+      <section class="slide tight">
+        <h2>검증 체계와 소요 시간</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>검증 층</th>
+              <th>비교 대상</th>
+              <th>목적</th>
+              <th class="num">예상 기간</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>저자 산출물 재현성</td>
+              <td>저자 Europe LST asset</td>
+              <td>원본 방식과 얼마나 가까운지</td>
+              <td class="num">2-5일</td>
+            </tr>
+            <tr>
+              <td>MODIS clear-sky</td>
+              <td>MOD11A1 valid/QC-good pixel</td>
+              <td>원 관측값 보존 여부</td>
+              <td class="num">1-2일</td>
+            </tr>
+            <tr>
+              <td>External LST</td>
+              <td>GLASS/GHA-LST 등</td>
+              <td>외부 all-weather product와 일관성</td>
+              <td class="num">3-7일</td>
+            </tr>
+            <tr>
+              <td>SM 검증</td>
+              <td>ISMN/FLUXNET/기존 검증 sample</td>
+              <td>최종 토양수분 정확도</td>
+              <td class="num">1-2주</td>
+            </tr>
+            <tr>
+              <td>Boundary</td>
+              <td>2020-12 to 2021-03</td>
+              <td>공식 GSSM과 확장 산출물 사이의 시간적 연속성</td>
+              <td class="num">2-4일</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small">GLASS/GHA-LST는 ground truth가 아니라 외부 산출물과의 일관성 평가로 해석.</p>
+      </section>
+
+      <section class="slide">
+        <h2>주요 리스크와 대응</h2>
+        <div class="bar-row">
+          <div>LST gap-fill 불확실성</div>
+          <div class="track"><div class="bar red" style="width: 82%"></div></div>
+          <div>높음</div>
+        </div>
+        <div class="bar-row">
+          <div>GEE quota/export 실패</div>
+          <div class="track"><div class="bar amber" style="width: 72%"></div></div>
+          <div>중간-높음</div>
+        </div>
+        <div class="bar-row">
+          <div>MODIS C6.1 연결성</div>
+          <div class="track"><div class="bar amber" style="width: 68%"></div></div>
+          <div>중간-높음</div>
+        </div>
+        <div class="bar-row">
+          <div>NDVI/EVI 전처리 차이</div>
+          <div class="track"><div class="bar amber" style="width: 52%"></div></div>
+          <div>중간</div>
+        </div>
+        <div class="bar-row">
+          <div>정적 predictor</div>
+          <div class="track"><div class="bar green" style="width: 22%"></div></div>
+          <div>낮음</div>
+        </div>
+        <div class="footer">
+          대응 원칙: 전지구 단일 asset보다 tile-year 단위 산출. 연구실 서버 저장을 전제로 품질 검증 후 기간 확장.
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>후속 검토 범위</h2>
+        <div class="grid-2">
+          <div>
+            <h3>LST 중심 검토</h3>
+            <ul>
+              <li>Pixel-time LST가 경도별 낮/밤 정의를 개선하는지 평가.</li>
+              <li>2020-2021 경계에서 <code>LST_DAILY</code>와 <code>LST_Diff</code>의 불연속성 확인.</li>
+              <li>Europe benchmark와 MODIS clear-sky consistency를 병행.</li>
+              <li>겨울·초봄 <code>LST_Diff</code> 오차의 snow/frozen 영향 검토.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>SM 산출 검토</h3>
+            <ul>
+              <li>공식 GSSM 2000-2020과 확장 산출물의 연결성 평가.</li>
+              <li>2021-2024 기간의 in-situ 검증 가능성 정리.</li>
+              <li>전지구 1개월 산출을 기준으로 실제 소요 시간 보정.</li>
+              <li>연구실 서버 저장을 전제로 산출 단위 확정.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="term">
+          <b>판단 기준</b>
+          <p>raw-valid RMSE≈0 유지, raw-gap <code>LST_DAILY</code>/<code>LST_Diff</code> 비열화, 2020-2021 경계 불연속 감소, SM 검증에서 공식 기간 대비 큰 성능 저하 없음.</p>
+        </div>
+      </section>
+
+      <section class="slide">
+        <h2>요약</h2>
+        <ul>
+          <li>2021-2024 산출물은 공식 GSSM과 구분되는 확장 산출물로 명시.</li>
+          <li>공식 GSSM 2000-2020은 그대로 사용.</li>
+          <li>전지구 산출 기본 방식: pixel-time ContinuousLST.</li>
+          <li>저자 LST와 완전 동일한 재현은 목표에서 제외.</li>
+          <li>대신 다층 benchmark와 2020-2021 경계 연속성으로 품질 판단.</li>
+        </ul>
+        <div class="grid-3" style="margin-top: 18px;">
+          <div class="card"><b>단축 시나리오</b><br>2-4주<br><span class="small">전처리 안정 가정</span></div>
+          <div class="card"><b>기준 시나리오</b><br>4-8주<br><span class="small">검증 포함</span></div>
+          <div class="card"><b>지연 시나리오</b><br>6-10주<br><span class="small">quota/retry 포함</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function scaleDeck() {
+      const deck = document.getElementById("deck");
+      const slideWidth = 1120;
+      const margin = 16;
+      const scale = Math.min(1, (window.innerWidth - margin) / slideWidth);
+      deck.style.transform = `scale(${scale})`;
+      deck.style.marginBottom = `${(scale - 1) * deck.offsetHeight}px`;
+    }
+    window.addEventListener("resize", scaleDeck);
+    window.addEventListener("load", scaleDeck);
+  </script>
+</body>
+</html>
