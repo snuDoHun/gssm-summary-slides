@@ -191,7 +191,7 @@
         </div>
         <div class="term">
           <b>현재 병목</b>
-          <p>gap-filled LST 중 CFSv2를 픽셀별 MODIS 관측시각에 맞추는 단계. 전지구 확장 전에 계산 구조 안정화 필요.</p>
+          <p>gap-filled LST에서 CFSv2 anomaly 시간을 전지구 local time에 맞추는 단계. 계산 비용을 줄이기 위해 nominal local-time 방식으로 전환.</p>
         </div>
       </section>
 
@@ -251,13 +251,13 @@
             <p>전지구에서는 같은 UTC라도 지역별 local time이 다름. day/night thermal contrast 재현에 영향.</p>
           </div>
           <div class="card">
-            <h3>pixel-time CFS 계산 부담</h3>
-            <p>각 픽셀의 MODIS view time에 맞춰 CFSv2를 보간하면 GEE 계산 그래프가 커짐.</p>
+            <h3>pixel-time 방식 중단</h3>
+            <p>MODIS view time을 픽셀별로 반영하면 계산량이 커짐. CFSv2 해상도와 시간간격을 고려해 기본 경로에서 제외.</p>
           </div>
         </div>
         <div class="term">
           <b>현재 방향</b>
-          <p>저자 LST의 bitwise reproduction보다, 전지구 적용 가능한 local-time ContinuousLST 구조를 우선 안정화.</p>
+          <p>저자 LST의 bitwise reproduction보다, 전지구 적용 가능한 nominal local-time ContinuousLST 구조를 우선 안정화.</p>
         </div>
       </section>
 
@@ -268,20 +268,20 @@
           <p>Europe 영역, 2002-2003 baseline, DOY 001-007.</p>
         </div>
         <div class="status">
-          <b>목적</b>
-          <p>CFSv2 pixel-time TFA를 작은 날짜 구간으로 나누면 GEE memory 오류가 줄어드는지 확인.</p>
+          <b>시간 매칭</b>
+          <p>Day는 10.5 local hour, night는 22.5 local hour. 경도별로 target UTC를 계산해 CFSv2 6-hour field와 연결.</p>
         </div>
         <div class="status">
           <b>상태</b>
-          <p><span class="warn">실행 중</span>. day와 night CFS pixel-time chunk export 모두 진행 중.</p>
+          <p><span class="warn">실행 중</span>. day와 night CFS nominal local-time chunk export 모두 진행 중.</p>
         </div>
         <div class="status">
           <b>의미</b>
-          <p>성공하면 7일 단위에서 15일 또는 31일 단위로 확장. 실패하면 CFS climatology 계산 구조 변경 필요.</p>
+          <p>성공하면 31일 chunk로 확대. 실패하면 CFS climatology를 월별 또는 UTC-slot lookup 구조로 더 단순화.</p>
         </div>
         <div>
-          <span class="pill">MODIS view time 사용</span>
-          <span class="pill">fallback 10.5/22.5 local hour</span>
+          <span class="pill">10.5/22.5 local hour</span>
+          <span class="pill">target UTC = local hour - lon/15</span>
           <span class="pill">CFSv2 6-hour linear interpolation</span>
           <span class="pill">DOY chunk export</span>
         </div>
@@ -300,21 +300,25 @@
           <tbody>
             <tr>
               <td><span class="ok">완료</span></td>
-              <td>DOY 15일 또는 31일 chunk로 확대.</td>
+              <td>DOY 31일 chunk로 확대.</td>
               <td>GEE memory 오류 없이 CFS day/night TFA 생성.</td>
             </tr>
             <tr>
               <td><span class="warn">느리지만 완료</span></td>
-              <td>chunk 크기를 유지하고 병렬 export 전략만 조정.</td>
+              <td>7-15일 chunk를 유지하고 병렬 export 전략만 조정.</td>
               <td>계산 시간은 길지만 재시도 후 성공.</td>
             </tr>
             <tr>
               <td><span class="bad">실패</span></td>
-              <td>CFS climatology를 시간대별 lookup 또는 월별 lookup 구조로 재설계.</td>
+              <td>CFS climatology를 월별 또는 UTC-slot lookup 구조로 재설계.</td>
               <td>7일 chunk에서도 out-of-memory 발생.</td>
             </tr>
           </tbody>
         </table>
+        <div class="term">
+          <b>예상 시간</b>
+          <p>nominal local-time smoke가 성공하면 Europe 전체 기준 CFS TFA는 수 시간-1일 단위, 전지구 2021+ pilot은 약 1-2주 단위로 재산정.</p>
+        </div>
         <div class="term">
           <b>smoke 이후 순서</b>
           <p>Europe 2012 benchmark 재비교 → training sample predictor 재추출 → 2021 단월 SM pilot → 2021-2024 확장.</p>
